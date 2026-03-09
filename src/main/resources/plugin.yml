@@ -1,0 +1,21 @@
+name: DonutRTP
+version: 1.0.0
+main: io.nightbeam.donutrtp.DonutRTPPlugin
+api-version: '1.20'
+folia-supported: true
+author: NightBeam
+description: DonutSMP-style RTP GUI for Paper and Folia.
+
+commands:
+  rtp:
+    description: Opens the RTP GUI
+    usage: /rtp [reload]
+    permission: donutrtp.use
+
+permissions:
+  donutrtp.use:
+    description: Allows using RTP GUI
+    default: true
+  donutrtp.admin:
+    description: Allows reloading DonutRTP config
+    default: op

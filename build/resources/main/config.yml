@@ -1,0 +1,20 @@
+warmup-seconds: 5
+cooldown-seconds: 30
+max-attempts: 30
+
+worlds:
+  overworld:
+    world-name: world
+    radius: 5000
+    min-y: 60
+  nether:
+    world-name: world_nether
+    radius: 4000
+    min-y: 40
+  end:
+    world-name: world_the_end
+    radius: 3000
+    min-y: 50
+
+gui:
+  fill-empty-slots: true
