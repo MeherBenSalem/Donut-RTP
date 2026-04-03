@@ -24,6 +24,10 @@ public final class FoliaCompat {
     }
 
     public void runAsync(Runnable task) {
+        if (folia) {
+            Bukkit.getAsyncScheduler().runNow(plugin, scheduledTask -> task.run());
+            return;
+        }
         Bukkit.getScheduler().runTaskAsynchronously(plugin, task);
     }
 
@@ -76,7 +80,7 @@ public final class FoliaCompat {
         try {
             Class<?> clazz = Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
             Method method = clazz.getDeclaredMethod("isGlobalTickThread");
-            return method != null && Bukkit.getName().toLowerCase().contains("folia");
+            return method != null;
         } catch (Throwable ignored) {
             return false;
         }

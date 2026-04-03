@@ -85,7 +85,7 @@ public final class RtpManager {
             return;
         }
 
-        locationFinder.findSafeLocation(world, worldSettings, settings.maxAttempts())
+        foliaCompat.runAsync(() -> locationFinder.findSafeLocation(world, worldSettings, settings.maxAttempts())
                 .thenAccept(location -> foliaCompat.runForEntity(player, () -> {
                     warmups.remove(player.getUniqueId());
 
@@ -102,6 +102,16 @@ public final class RtpManager {
                     long expiresAt = Instant.now().getEpochSecond() + settings.cooldownSeconds();
                     cooldownUntilEpoch.put(player.getUniqueId(), expiresAt);
                     player.sendMessage(configManager.message("teleported"));
+                }))
+                .exceptionally(throwable -> {
+                    foliaCompat.runForEntity(player, () -> {
+                        warmups.remove(player.getUniqueId());
+                        if (player.isOnline()) {
+                            player.sendMessage(configManager.message("no-safe-location"));
+                        }
+                    });
+                    plugin.getLogger().warning("Failed to find RTP location: " + throwable.getMessage());
+                    return null;
                 }));
     }
 
