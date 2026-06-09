@@ -4,6 +4,8 @@ import io.nightbeam.donutrtp.config.ConfigManager;
 import io.nightbeam.donutrtp.util.FoliaCompat;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
 
 public final class WarmupTask {
@@ -37,6 +39,7 @@ public final class WarmupTask {
         if (!active.compareAndSet(true, false)) {
             return;
         }
+        clearActionBar();
         if (sendCallback) {
             onCancelled.run();
         }
@@ -58,16 +61,29 @@ public final class WarmupTask {
         int left = secondsLeft.getAndDecrement();
         if (left <= 0) {
             if (active.compareAndSet(true, false)) {
+                clearActionBar();
                 onComplete.run();
             }
             return;
         }
 
-        player.sendMessage(configManager.message("countdown").replace("%seconds%", String.valueOf(left)));
+        sendCountdownActionBar(left);
         if (left == initialSeconds) {
             player.sendMessage(configManager.message("countdown-warning"));
         }
 
         foliaCompat.runLaterForEntity(player, this::tick, 20L);
+    }
+
+    private void sendCountdownActionBar(int seconds) {
+        String text = configManager.plainMessage("countdown-actionbar")
+                .replace("%seconds%", String.valueOf(seconds));
+        player.sendActionBar(LegacyComponentSerializer.legacySection().deserialize(text));
+    }
+
+    private void clearActionBar() {
+        if (player.isOnline()) {
+            player.sendActionBar(Component.empty());
+        }
     }
 }

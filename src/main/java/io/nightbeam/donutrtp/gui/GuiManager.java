@@ -1,10 +1,11 @@
 package io.nightbeam.donutrtp.gui;
 
 import io.nightbeam.donutrtp.config.ConfigManager;
+import io.nightbeam.donutrtp.config.GuiItemSettings;
 import io.nightbeam.donutrtp.config.Settings;
 import io.nightbeam.donutrtp.rtp.RtpManager;
 import io.nightbeam.donutrtp.rtp.WorldType;
-import java.util.List;
+import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -16,15 +17,24 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public final class GuiManager implements Listener {
 
     private static final String TITLE = "ʀᴀɴᴅᴏᴍ ᴛᴇʟᴇᴘᴏʀᴛ";
 
+    private static final Map<WorldType, Material> DEFAULT_MATERIALS = Map.of(
+            WorldType.OVERWORLD, Material.GRASS_BLOCK,
+            WorldType.NETHER, Material.NETHERRACK,
+            WorldType.END, Material.END_STONE
+    );
+
+    private final JavaPlugin plugin;
     private final ConfigManager configManager;
     private final RtpManager rtpManager;
 
-    public GuiManager(ConfigManager configManager, RtpManager rtpManager) {
+    public GuiManager(JavaPlugin plugin, ConfigManager configManager, RtpManager rtpManager) {
+        this.plugin = plugin;
         this.configManager = configManager;
         this.rtpManager = rtpManager;
     }
@@ -34,24 +44,18 @@ public final class GuiManager implements Listener {
         Settings settings = configManager.settings();
 
         if (settings.fillEmptySlots()) {
-            ItemStack filler = createItem(Material.GRAY_STAINED_GLASS_PANE, " ", List.of());
+            ItemStack filler = createFillerItem();
             for (int i = 0; i < inv.getSize(); i++) {
                 inv.setItem(i, filler);
             }
         }
 
-        inv.setItem(11, createItem(Material.GRASS_BLOCK, "§aOverworld RTP", List.of(
-                "§7Click to randomly teleport",
-                "§7in the Overworld"
-        )));
-        inv.setItem(13, createItem(Material.NETHERRACK, "§cNether RTP", List.of(
-                "§7Click to randomly teleport",
-                "§7in the Nether"
-        )));
-        inv.setItem(15, createItem(Material.END_STONE, "§dEnd RTP", List.of(
-                "§7Click to randomly teleport",
-                "§7in The End"
-        )));
+        for (WorldType worldType : WorldType.values()) {
+            GuiItemSettings itemSettings = settings.guiItems().get(worldType);
+            Material fallback = DEFAULT_MATERIALS.get(worldType);
+            ItemStack item = GuiItemBuilder.build(itemSettings, fallback, plugin.getLogger());
+            inv.setItem(itemSettings.slot(), item);
+        }
 
         player.openInventory(inv);
     }
@@ -74,14 +78,7 @@ public final class GuiManager implements Listener {
             return;
         }
 
-        int slot = event.getRawSlot();
-        WorldType selected = switch (slot) {
-            case 11 -> WorldType.OVERWORLD;
-            case 13 -> WorldType.NETHER;
-            case 15 -> WorldType.END;
-            default -> null;
-        };
-
+        WorldType selected = worldTypeForSlot(event.getRawSlot());
         if (selected == null) {
             return;
         }
@@ -90,12 +87,21 @@ public final class GuiManager implements Listener {
         rtpManager.startTeleport(player, selected);
     }
 
-    private ItemStack createItem(Material material, String displayName, List<String> lore) {
-        ItemStack item = new ItemStack(material);
+    private WorldType worldTypeForSlot(int slot) {
+        Settings settings = configManager.settings();
+        for (Map.Entry<WorldType, GuiItemSettings> entry : settings.guiItems().entrySet()) {
+            if (entry.getValue().slot() == slot) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+    private ItemStack createFillerItem() {
+        ItemStack item = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(displayName);
-            meta.setLore(lore);
+            meta.setDisplayName(" ");
             meta.addItemFlags(ItemFlag.values());
             item.setItemMeta(meta);
         }

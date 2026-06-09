@@ -26,7 +26,7 @@ public final class DonutRTPPlugin extends JavaPlugin {
         this.configManager.reload();
 
         this.rtpManager = new RtpManager(this, foliaCompat, configManager);
-        this.guiManager = new GuiManager(configManager, rtpManager);
+        this.guiManager = new GuiManager(this, configManager, rtpManager);
 
         getServer().getPluginManager().registerEvents(guiManager, this);
         getServer().getPluginManager().registerEvents(new PlayerMoveCancelListener(rtpManager), this);

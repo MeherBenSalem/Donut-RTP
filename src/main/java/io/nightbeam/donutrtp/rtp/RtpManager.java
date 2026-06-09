@@ -2,6 +2,7 @@ package io.nightbeam.donutrtp.rtp;
 
 import io.nightbeam.donutrtp.config.ConfigManager;
 import io.nightbeam.donutrtp.config.Settings;
+import io.nightbeam.donutrtp.config.TeleportSoundSettings;
 import io.nightbeam.donutrtp.config.WorldSettings;
 import io.nightbeam.donutrtp.util.FoliaCompat;
 import java.time.Instant;
@@ -99,6 +100,7 @@ public final class RtpManager {
                     }
 
                     teleport(player, location);
+                    playTeleportSound(player, settings);
                     long expiresAt = Instant.now().getEpochSecond() + settings.cooldownSeconds();
                     cooldownUntilEpoch.put(player.getUniqueId(), expiresAt);
                     player.sendMessage(configManager.message("teleported"));
@@ -117,5 +119,18 @@ public final class RtpManager {
 
     private void teleport(Player player, Location location) {
         foliaCompat.teleport(player, location);
+    }
+
+    private void playTeleportSound(Player player, Settings settings) {
+        TeleportSoundSettings soundSettings = settings.teleportSound();
+        if (!soundSettings.enabled()) {
+            return;
+        }
+        player.playSound(
+                player.getLocation(),
+                soundSettings.sound(),
+                soundSettings.volume(),
+                soundSettings.pitch()
+        );
     }
 }

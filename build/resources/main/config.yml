@@ -16,5 +16,45 @@ worlds:
     radius: 3000
     min-y: 50
 
+# GUI customization. Invalid materials, heads, or slots log a warning and fall back to defaults.
 gui:
   fill-empty-slots: true
+  items:
+    overworld:
+      slot: 11
+      name: "&aOverworld RTP"
+      lore:
+        - "&7Click to randomly teleport"
+        - "&7in the Overworld"
+      material: GRASS_BLOCK
+      # Use a custom player head instead of material (head takes priority if set):
+      # head:
+      #   texture: "3b3125891576299764df12836f0b287cd85b9fbb529b2ff7bceb784d48cba"  # texture hash or full base64
+      #   # uuid: "550e8400-e29b-41d4-a716-446655440000"
+      #   # player: "Notch"
+    nether:
+      slot: 13
+      name: "&cNether RTP"
+      lore:
+        - "&7Click to randomly teleport"
+        - "&7in the Nether"
+      material: NETHERRACK
+    end:
+      slot: 15
+      name: "&dEnd RTP"
+      lore:
+        - "&7Click to randomly teleport"
+        - "&7in The End"
+      material: END_STONE
+
+# Sound played when a teleport succeeds. Invalid sounds fall back to ENTITY_ENDERMAN_TELEPORT.
+teleport-sound:
+  enabled: true
+  sound: ENTITY_ENDERMAN_TELEPORT  # Bukkit enum name or namespaced key (e.g. entity.enderman.teleport)
+  volume: 1.0  # 0.0 to 2.0
+  pitch: 1.0   # 0.0 to 2.0
+  # Examples:
+  # enabled: false
+  # sound: BLOCK_PORTAL_TRAVEL
+  # volume: 0.8
+  # pitch: 1.2

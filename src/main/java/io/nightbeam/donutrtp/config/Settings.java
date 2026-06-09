@@ -8,6 +8,8 @@ public record Settings(
         int cooldownSeconds,
         int maxAttempts,
         boolean fillEmptySlots,
+        Map<WorldType, GuiItemSettings> guiItems,
+        TeleportSoundSettings teleportSound,
         Map<WorldType, WorldSettings> worlds
 ) {
 }
