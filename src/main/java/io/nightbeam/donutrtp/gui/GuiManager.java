@@ -5,6 +5,7 @@ import io.nightbeam.donutrtp.config.GuiItemSettings;
 import io.nightbeam.donutrtp.config.Settings;
 import io.nightbeam.donutrtp.rtp.RtpManager;
 import io.nightbeam.donutrtp.rtp.WorldType;
+import io.nightbeam.donutrtp.util.HeadDatabaseService;
 import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -32,11 +33,18 @@ public final class GuiManager implements Listener {
     private final JavaPlugin plugin;
     private final ConfigManager configManager;
     private final RtpManager rtpManager;
+    private final HeadDatabaseService headDatabaseService;
 
-    public GuiManager(JavaPlugin plugin, ConfigManager configManager, RtpManager rtpManager) {
+    public GuiManager(
+            JavaPlugin plugin,
+            ConfigManager configManager,
+            RtpManager rtpManager,
+            HeadDatabaseService headDatabaseService
+    ) {
         this.plugin = plugin;
         this.configManager = configManager;
         this.rtpManager = rtpManager;
+        this.headDatabaseService = headDatabaseService;
     }
 
     public void openMenu(Player player) {
@@ -53,7 +61,7 @@ public final class GuiManager implements Listener {
         for (WorldType worldType : WorldType.values()) {
             GuiItemSettings itemSettings = settings.guiItems().get(worldType);
             Material fallback = DEFAULT_MATERIALS.get(worldType);
-            ItemStack item = GuiItemBuilder.build(itemSettings, fallback, plugin.getLogger());
+            ItemStack item = GuiItemBuilder.build(itemSettings, fallback, headDatabaseService, plugin.getLogger());
             inv.setItem(itemSettings.slot(), item);
         }
 

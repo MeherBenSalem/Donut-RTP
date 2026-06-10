@@ -2,6 +2,9 @@ warmup-seconds: 5
 cooldown-seconds: 30
 max-attempts: 30
 
+# When true, teleports immediately after a safe location is found (skips warmup countdown).
+instant-teleport: false
+
 worlds:
   overworld:
     world-name: world
@@ -27,6 +30,8 @@ gui:
         - "&7Click to randomly teleport"
         - "&7in the Overworld"
       material: GRASS_BLOCK
+      # Use a HeadDatabase ID as the icon (requires HeadDatabase plugin):
+      # material: "hdb-46772"
       # Use a custom player head instead of material (head takes priority if set):
       # head:
       #   texture: "3b3125891576299764df12836f0b287cd85b9fbb529b2ff7bceb784d48cba"  # texture hash or full base64
@@ -46,6 +51,13 @@ gui:
         - "&7Click to randomly teleport"
         - "&7in The End"
       material: END_STONE
+
+# Sound played each second during the warmup action bar countdown.
+actionbar-cooldown:
+  enabled: false
+  sound: BLOCK_NOTE_BLOCK_HAT  # Bukkit enum name or namespaced key (e.g. block.note_block.hat)
+  volume: 1.0  # 0.0 to 2.0
+  pitch: 1.0   # 0.0 to 2.0
 
 # Sound played when a teleport succeeds. Invalid sounds fall back to ENTITY_ENDERMAN_TELEPORT.
 teleport-sound:

@@ -1,5 +1,6 @@
 package io.nightbeam.donutrtp.rtp;
 
+import io.nightbeam.donutrtp.config.ActionBarCooldownSoundSettings;
 import io.nightbeam.donutrtp.config.ConfigManager;
 import io.nightbeam.donutrtp.util.FoliaCompat;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -12,6 +13,7 @@ public final class WarmupTask {
 
     private final FoliaCompat foliaCompat;
     private final ConfigManager configManager;
+    private final ActionBarCooldownSoundSettings countdownSound;
     private final Player player;
     private final Runnable onComplete;
     private final Runnable onCancelled;
@@ -20,10 +22,18 @@ public final class WarmupTask {
     private final AtomicInteger secondsLeft;
     private final int initialSeconds;
 
-    public WarmupTask(FoliaCompat foliaCompat, ConfigManager configManager, Player player,
-                      int warmupSeconds, Runnable onComplete, Runnable onCancelled) {
+    public WarmupTask(
+            FoliaCompat foliaCompat,
+            ConfigManager configManager,
+            ActionBarCooldownSoundSettings countdownSound,
+            Player player,
+            int warmupSeconds,
+            Runnable onComplete,
+            Runnable onCancelled
+    ) {
         this.foliaCompat = foliaCompat;
         this.configManager = configManager;
+        this.countdownSound = countdownSound;
         this.player = player;
         this.onComplete = onComplete;
         this.onCancelled = onCancelled;
@@ -68,6 +78,7 @@ public final class WarmupTask {
         }
 
         sendCountdownActionBar(left);
+        playCountdownSound();
         if (left == initialSeconds) {
             player.sendMessage(configManager.message("countdown-warning"));
         }
@@ -79,6 +90,18 @@ public final class WarmupTask {
         String text = configManager.plainMessage("countdown-actionbar")
                 .replace("%seconds%", String.valueOf(seconds));
         player.sendActionBar(LegacyComponentSerializer.legacySection().deserialize(text));
+    }
+
+    private void playCountdownSound() {
+        if (!countdownSound.enabled()) {
+            return;
+        }
+        player.playSound(
+                player.getLocation(),
+                countdownSound.sound(),
+                countdownSound.volume(),
+                countdownSound.pitch()
+        );
     }
 
     private void clearActionBar() {

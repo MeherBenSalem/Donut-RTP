@@ -6,6 +6,7 @@ import io.nightbeam.donutrtp.gui.GuiManager;
 import io.nightbeam.donutrtp.listener.PlayerMoveCancelListener;
 import io.nightbeam.donutrtp.rtp.RtpManager;
 import io.nightbeam.donutrtp.util.FoliaCompat;
+import io.nightbeam.donutrtp.util.HeadDatabaseService;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -13,6 +14,7 @@ public final class DonutRTPPlugin extends JavaPlugin {
 
     private FoliaCompat foliaCompat;
     private ConfigManager configManager;
+    private HeadDatabaseService headDatabaseService;
     private GuiManager guiManager;
     private RtpManager rtpManager;
 
@@ -24,9 +26,10 @@ public final class DonutRTPPlugin extends JavaPlugin {
         this.foliaCompat = new FoliaCompat(this);
         this.configManager = new ConfigManager(this);
         this.configManager.reload();
+        this.headDatabaseService = new HeadDatabaseService(this);
 
         this.rtpManager = new RtpManager(this, foliaCompat, configManager);
-        this.guiManager = new GuiManager(this, configManager, rtpManager);
+        this.guiManager = new GuiManager(this, configManager, rtpManager, headDatabaseService);
 
         getServer().getPluginManager().registerEvents(guiManager, this);
         getServer().getPluginManager().registerEvents(new PlayerMoveCancelListener(rtpManager), this);

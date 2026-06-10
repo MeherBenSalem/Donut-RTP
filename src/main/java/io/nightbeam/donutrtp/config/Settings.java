@@ -7,9 +7,11 @@ public record Settings(
         int warmupSeconds,
         int cooldownSeconds,
         int maxAttempts,
+        boolean instantTeleport,
         boolean fillEmptySlots,
         Map<WorldType, GuiItemSettings> guiItems,
         TeleportSoundSettings teleportSound,
+        ActionBarCooldownSoundSettings actionBarCooldownSound,
         Map<WorldType, WorldSettings> worlds
 ) {
 }

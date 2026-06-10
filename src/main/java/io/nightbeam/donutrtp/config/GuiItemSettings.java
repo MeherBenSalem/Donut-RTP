@@ -8,6 +8,10 @@ public record GuiItemSettings(
         String name,
         List<String> lore,
         Material material,
-        HeadSettings head
+        HeadSettings head,
+        String headDatabaseId
 ) {
+    public boolean hasHeadDatabaseId() {
+        return headDatabaseId != null && !headDatabaseId.isBlank();
+    }
 }

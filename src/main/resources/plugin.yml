@@ -3,6 +3,7 @@ version: '${version}'
 main: io.nightbeam.donutrtp.DonutRTPPlugin
 api-version: '1.20'
 folia-supported: true
+softdepend: [HeadDatabase]
 author: NightBeam
 description: DonutSMP-style RTP GUI for Paper and Folia.
 

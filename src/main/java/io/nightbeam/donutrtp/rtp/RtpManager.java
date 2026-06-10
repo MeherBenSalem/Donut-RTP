@@ -50,6 +50,11 @@ public final class RtpManager {
             return;
         }
 
+        if (settings.instantTeleport()) {
+            doTeleport(player, world, worldSettings, settings);
+            return;
+        }
+
         WarmupTask previous = warmups.remove(player.getUniqueId());
         if (previous != null) {
             previous.cancel(false);
@@ -58,6 +63,7 @@ public final class RtpManager {
         WarmupTask warmup = new WarmupTask(
                 foliaCompat,
                 configManager,
+                settings.actionBarCooldownSound(),
                 player,
                 settings.warmupSeconds(),
                 () -> doTeleport(player, world, worldSettings, settings),

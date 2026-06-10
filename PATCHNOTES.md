@@ -1,5 +1,20 @@
 # DonutRTP Patch Notes
 
+## 1.2.0
+
+### Added
+- **HeadDatabase ID support** — GUI items can use a HeadDatabase head via `material: "hdb-<id>"` (requires HeadDatabase plugin). Existing material and `head` block formats are unchanged.
+- **Action bar cooldown sound** — Optional sound played each second during the warmup countdown (`actionbar-cooldown` in `config.yml`). Disabled by default for backwards compatibility.
+- **Instant teleport option** — Set `instant-teleport: true` to skip the warmup countdown and teleport immediately after a safe location is found.
+
+### Configuration
+- New `instant-teleport` key in `config.yml` (default: `false`)
+- New `actionbar-cooldown` section in `config.yml` (see inline comments for examples)
+- HeadDatabase example under `gui.items` in `config.yml`
+- Missing config keys are backfilled with sensible defaults on reload
+
+---
+
 ## 1.1.0
 
 ### Added

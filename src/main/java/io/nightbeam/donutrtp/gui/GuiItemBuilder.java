@@ -4,6 +4,7 @@ import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import io.nightbeam.donutrtp.config.GuiItemSettings;
 import io.nightbeam.donutrtp.config.HeadSettings;
+import io.nightbeam.donutrtp.util.HeadDatabaseService;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
@@ -23,8 +24,12 @@ public final class GuiItemBuilder {
     private GuiItemBuilder() {
     }
 
-    public static ItemStack build(GuiItemSettings settings, Material fallbackMaterial, Logger logger) {
-        Material material = fallbackMaterial;
+    public static ItemStack build(
+            GuiItemSettings settings,
+            Material fallbackMaterial,
+            HeadDatabaseService headDatabaseService,
+            Logger logger
+    ) {
         ItemStack item;
 
         if (settings.head() != null && settings.head().isPresent()) {
@@ -32,12 +37,19 @@ public final class GuiItemBuilder {
             if (headItem != null) {
                 item = headItem;
             } else {
-                material = resolveMaterial(settings.material(), fallbackMaterial, logger);
-                item = new ItemStack(material);
+                item = new ItemStack(resolveMaterial(settings.material(), fallbackMaterial, logger));
+            }
+        } else if (settings.hasHeadDatabaseId()) {
+            ItemStack headItem = headDatabaseService.getHead(settings.headDatabaseId()).orElse(null);
+            if (headItem != null) {
+                item = headItem;
+            } else {
+                logger.warning("Could not resolve HeadDatabase head '" + settings.headDatabaseId()
+                        + "', using default material " + fallbackMaterial);
+                item = new ItemStack(fallbackMaterial);
             }
         } else {
-            material = resolveMaterial(settings.material(), fallbackMaterial, logger);
-            item = new ItemStack(material);
+            item = new ItemStack(resolveMaterial(settings.material(), fallbackMaterial, logger));
         }
 
         applyMeta(item, settings.name(), settings.lore());
