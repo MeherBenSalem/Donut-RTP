@@ -1,6 +1,6 @@
 warmup-seconds: 5
-cooldown-seconds: 30
-max-attempts: 30
+cooldown-seconds: 300
+max-attempts: 60
 
 # When true, teleports immediately after a safe location is found (skips warmup countdown).
 instant-teleport: false

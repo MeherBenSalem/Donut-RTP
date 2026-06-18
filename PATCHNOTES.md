@@ -1,5 +1,17 @@
 # DonutRTP Patch Notes
 
+## 1.2.1
+
+### Bug Fixes
+* Fixed frequent "Failed to find a safe location" by loading chunks before checks, using world-aware height scanning (Nether cave scan), and allowing passable decorative blocks at feet/head
+
+### Configuration
+* Default `cooldown-seconds` changed from 30 to 300
+* Default `max-attempts` increased from 30 to 60
+* Existing servers: update `cooldown-seconds: 300` in your config.yml to apply the new cooldown
+
+---
+
 ## 1.2.0
 
 ### Added
