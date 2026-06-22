@@ -20,3 +20,6 @@ permissions:
   donutrtp.admin:
     description: Allows reloading DonutRTP config
     default: op
+  donutrtp.zone.use:
+    description: Allows using RTP zones
+    default: true

@@ -1,5 +1,19 @@
 # DonutRTP Patch Notes
 
+## 1.3.0
+
+### New Features
+* RTPZone mechanic — configurable cuboid zones that start a title/subtitle countdown on entry and random-teleport players when it completes
+
+### Configuration
+* New `rtp-zones` section in `config.yml` (disabled by default)
+* Per-zone: world, center, half-size (X/Y/Z), countdown-seconds, world-type, optional permission
+
+### Permissions
+* `donutrtp.zone.use` — allows triggering RTP zones (default: true)
+
+---
+
 ## 1.2.1
 
 ### Bug Fixes

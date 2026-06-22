@@ -70,3 +70,20 @@ teleport-sound:
   # sound: BLOCK_PORTAL_TRAVEL
   # volume: 0.8
   # pitch: 1.2
+
+# RTP zones: stand inside a zone to start a countdown, then get randomly teleported.
+rtp-zones:
+  enabled: false
+  zones:
+    spawn_pad:
+      enabled: true
+      world: world
+      world-type: OVERWORLD
+      x: 0.5
+      y: 64.0
+      z: 0.5
+      half-size-x: 3
+      half-size-y: 2
+      half-size-z: 3
+      countdown-seconds: 10
+      # permission: donutrtp.zone.spawn_pad

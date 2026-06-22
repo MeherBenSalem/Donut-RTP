@@ -1,6 +1,7 @@
 package io.nightbeam.donutrtp.config;
 
 import io.nightbeam.donutrtp.rtp.WorldType;
+import java.util.List;
 import java.util.Map;
 
 public record Settings(
@@ -12,6 +13,8 @@ public record Settings(
         Map<WorldType, GuiItemSettings> guiItems,
         TeleportSoundSettings teleportSound,
         ActionBarCooldownSoundSettings actionBarCooldownSound,
-        Map<WorldType, WorldSettings> worlds
+        Map<WorldType, WorldSettings> worlds,
+        boolean rtpZonesEnabled,
+        List<RtpZoneSettings> rtpZones
 ) {
 }

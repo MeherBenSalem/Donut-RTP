@@ -6,6 +6,7 @@ import io.nightbeam.donutrtp.rtp.WorldType;
 
 import java.io.File;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 
 import java.util.List;
@@ -128,28 +129,21 @@ public final class ConfigManager {
 
         worlds.put(WorldType.END, readWorldSettings(config, "worlds.end", "world_the_end", 3000, 50));
 
-
+        boolean rtpZonesEnabled = config.getBoolean("rtp-zones.enabled", false);
+        List<RtpZoneSettings> rtpZones = readRtpZones(config);
 
         this.cachedSettings = new Settings(
-
                 warmup,
-
                 cooldown,
-
                 maxAttempts,
-
                 instantTeleport,
-
                 fillEmpty,
-
                 guiItems,
-
                 teleportSound,
-
                 actionBarCooldownSound,
-
-                worlds
-
+                worlds,
+                rtpZonesEnabled,
+                rtpZones
         );
 
     }
@@ -252,7 +246,13 @@ public final class ConfigManager {
 
         }
 
+        if (!config.isSet("rtp-zones.enabled")) {
 
+            config.set("rtp-zones.enabled", false);
+
+            changed = true;
+
+        }
 
         if (changed) {
 
@@ -507,6 +507,92 @@ public final class ConfigManager {
         int minY = config.getInt(path + ".min-y", defaultMinY);
 
         return new WorldSettings(worldName, radius, minY);
+
+    }
+
+    private List<RtpZoneSettings> readRtpZones(FileConfiguration config) {
+
+        ConfigurationSection section = config.getConfigurationSection("rtp-zones.zones");
+
+        if (section == null) {
+
+            return List.of();
+
+        }
+
+        List<RtpZoneSettings> zones = new ArrayList<>();
+
+        for (String id : section.getKeys(false)) {
+
+            String path = "rtp-zones.zones." + id;
+
+            boolean enabled = config.getBoolean(path + ".enabled", true);
+
+            String world = config.getString(path + ".world");
+
+            if (world == null || world.isBlank()) {
+
+                plugin.getLogger().warning("RTP zone '" + id + "' is missing world, skipping");
+
+                continue;
+
+            }
+
+            String worldTypeRaw = config.getString(path + ".world-type", "OVERWORLD");
+
+            WorldType worldType;
+
+            try {
+
+                worldType = WorldType.valueOf(worldTypeRaw.trim().toUpperCase());
+
+            } catch (IllegalArgumentException ex) {
+
+                plugin.getLogger().warning("Invalid world-type '" + worldTypeRaw + "' for RTP zone '" + id + "', skipping");
+
+                continue;
+
+            }
+
+            int countdown = Math.max(1, config.getInt(path + ".countdown-seconds", 10));
+
+            double halfSizeX = Math.max(0.5, config.getDouble(path + ".half-size-x", 1.0));
+
+            double halfSizeY = Math.max(0.5, config.getDouble(path + ".half-size-y", 1.0));
+
+            double halfSizeZ = Math.max(0.5, config.getDouble(path + ".half-size-z", 1.0));
+
+            zones.add(new RtpZoneSettings(
+
+                    id,
+
+                    enabled,
+
+                    world.trim(),
+
+                    config.getDouble(path + ".x"),
+
+                    config.getDouble(path + ".y"),
+
+                    config.getDouble(path + ".z"),
+
+                    halfSizeX,
+
+                    halfSizeY,
+
+                    halfSizeZ,
+
+                    countdown,
+
+                    worldType,
+
+                    config.getString(path + ".permission")
+
+            ));
+
+        }
+
+        return List.copyOf(zones);
 
     }
 

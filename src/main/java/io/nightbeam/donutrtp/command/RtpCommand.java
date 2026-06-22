@@ -2,6 +2,7 @@ package io.nightbeam.donutrtp.command;
 
 import io.nightbeam.donutrtp.config.ConfigManager;
 import io.nightbeam.donutrtp.gui.GuiManager;
+import io.nightbeam.donutrtp.rtp.RtpZoneManager;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,10 +17,12 @@ public final class RtpCommand implements CommandExecutor, TabCompleter {
 
     private final ConfigManager configManager;
     private final GuiManager guiManager;
+    private final RtpZoneManager rtpZoneManager;
 
-    public RtpCommand(ConfigManager configManager, GuiManager guiManager) {
+    public RtpCommand(ConfigManager configManager, GuiManager guiManager, RtpZoneManager rtpZoneManager) {
         this.configManager = configManager;
         this.guiManager = guiManager;
+        this.rtpZoneManager = rtpZoneManager;
     }
 
     @Override
@@ -30,6 +33,7 @@ public final class RtpCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
             configManager.reload();
+            rtpZoneManager.reload();
             sender.sendMessage(configManager.message("reloaded"));
             return true;
         }

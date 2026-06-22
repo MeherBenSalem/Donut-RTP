@@ -73,6 +73,27 @@ public final class RtpManager {
         warmup.start();
     }
 
+    public void teleportRandom(Player player, WorldType type) {
+        Settings settings = configManager.settings();
+        long now = Instant.now().getEpochSecond();
+        long cooldownUntil = cooldownUntilEpoch.getOrDefault(player.getUniqueId(), 0L);
+
+        if (cooldownUntil > now) {
+            long wait = cooldownUntil - now;
+            player.sendMessage(configManager.message("cooldown").replace("%time%", String.valueOf(wait)));
+            return;
+        }
+
+        WorldSettings worldSettings = settings.worlds().get(type);
+        World world = Bukkit.getWorld(worldSettings.worldName());
+        if (world == null) {
+            player.sendMessage(configManager.message("world-not-found"));
+            return;
+        }
+
+        doTeleport(player, world, worldSettings, settings);
+    }
+
     public void cancelWarmupIfMoving(Player player) {
         WarmupTask warmup = warmups.remove(player.getUniqueId());
         if (warmup != null && warmup.isActive()) {

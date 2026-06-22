@@ -4,7 +4,9 @@ import io.nightbeam.donutrtp.command.RtpCommand;
 import io.nightbeam.donutrtp.config.ConfigManager;
 import io.nightbeam.donutrtp.gui.GuiManager;
 import io.nightbeam.donutrtp.listener.PlayerMoveCancelListener;
+import io.nightbeam.donutrtp.listener.RtpZoneListener;
 import io.nightbeam.donutrtp.rtp.RtpManager;
+import io.nightbeam.donutrtp.rtp.RtpZoneManager;
 import io.nightbeam.donutrtp.util.FoliaCompat;
 import io.nightbeam.donutrtp.util.HeadDatabaseService;
 import org.bukkit.command.PluginCommand;
@@ -17,6 +19,7 @@ public final class DonutRTPPlugin extends JavaPlugin {
     private HeadDatabaseService headDatabaseService;
     private GuiManager guiManager;
     private RtpManager rtpManager;
+    private RtpZoneManager rtpZoneManager;
 
     @Override
     public void onEnable() {
@@ -29,14 +32,16 @@ public final class DonutRTPPlugin extends JavaPlugin {
         this.headDatabaseService = new HeadDatabaseService(this);
 
         this.rtpManager = new RtpManager(this, foliaCompat, configManager);
+        this.rtpZoneManager = new RtpZoneManager(foliaCompat, configManager, rtpManager);
         this.guiManager = new GuiManager(this, configManager, rtpManager, headDatabaseService);
 
         getServer().getPluginManager().registerEvents(guiManager, this);
         getServer().getPluginManager().registerEvents(new PlayerMoveCancelListener(rtpManager), this);
+        getServer().getPluginManager().registerEvents(new RtpZoneListener(rtpZoneManager), this);
 
         PluginCommand rtp = getCommand("rtp");
         if (rtp != null) {
-            RtpCommand command = new RtpCommand(configManager, guiManager);
+            RtpCommand command = new RtpCommand(configManager, guiManager, rtpZoneManager);
             rtp.setExecutor(command);
             rtp.setTabCompleter(command);
         } else {
@@ -48,6 +53,9 @@ public final class DonutRTPPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (rtpZoneManager != null) {
+            rtpZoneManager.shutdown();
+        }
         if (rtpManager != null) {
             rtpManager.shutdown();
         }
