@@ -5,6 +5,14 @@ max-attempts: 60
 # When true, teleports immediately after a safe location is found (skips warmup countdown).
 instant-teleport: false
 
+update-check:
+  # Check Modrinth for a newer release when the plugin starts.
+  enabled: true
+  # Notify players with donutrtp.admin when they join if an update was found.
+  notify-ops-on-join: true
+  # Placeholders: {0} = latest version, {1} = download URL
+  join-message: "&e[DonutRTP] &7Update available: &f{0} &7— &b{1}"
+
 worlds:
   overworld:
     world-name: world
@@ -98,6 +106,9 @@ rtp-zone:
   countdown:
     enabled: true
     seconds: 5
+    # Cancel the countdown if the player walks out of their block during warmup.
+    # Jumping in place (vertical-only movement) never cancels. Leaving the zone
+    # always cancels regardless of this setting.
     cancel-on-move: false
 
   messages:

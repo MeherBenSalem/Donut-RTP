@@ -39,6 +39,11 @@ public final class SafeLocationFinder {
             Material.WITHER_ROSE
     );
 
+    // How far below the surface top to scan for a stand-able floor. Covers snow
+    // layers, carpets, tall grass, and heightmap off-by-one differences so that
+    // ordinary flat terrain is not wrongly rejected.
+    private static final int SURFACE_SCAN_DEPTH = 4;
+
     private final FoliaCompat foliaCompat;
     private final Logger logger;
 
@@ -99,13 +104,23 @@ public final class SafeLocationFinder {
     }
 
     private Location findAtSurface(World world, int x, int z, int minY) {
-        int highest = world.getHighestBlockYAt(x, z, HeightMap.MOTION_BLOCKING);
-        if (highest < minY) {
+        // NO_LEAVES so tree canopies do not report a "surface" up in the leaves.
+        int top = world.getHighestBlockYAt(x, z, HeightMap.MOTION_BLOCKING_NO_LEAVES);
+        if (top < minY) {
             return null;
         }
 
-        int floorY = highest - 1;
-        return checkSpot(world, x, floorY, z, minY);
+        // Scan downward from the surface: the top block is the intended floor
+        // (feet sit at top+1). Scanning a small window absorbs snow layers,
+        // carpets, and heightmap off-by-one behaviour across server forks.
+        int bottom = Math.max(minY, top - SURFACE_SCAN_DEPTH);
+        for (int floorY = top; floorY >= bottom; floorY--) {
+            Location location = checkSpot(world, x, floorY, z, minY);
+            if (location != null) {
+                return location;
+            }
+        }
+        return null;
     }
 
     private Location findAtNether(World world, int x, int z, int minY) {

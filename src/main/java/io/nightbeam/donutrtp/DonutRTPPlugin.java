@@ -4,12 +4,15 @@ import io.nightbeam.donutrtp.command.RtpCommand;
 import io.nightbeam.donutrtp.config.ConfigManager;
 import io.nightbeam.donutrtp.gui.GuiManager;
 import io.nightbeam.donutrtp.integration.worldguard.WorldGuardHook;
+import io.nightbeam.donutrtp.listener.PlayerJoinListener;
 import io.nightbeam.donutrtp.listener.PlayerMoveCancelListener;
 import io.nightbeam.donutrtp.listener.RtpZoneListener;
 import io.nightbeam.donutrtp.rtp.RtpManager;
 import io.nightbeam.donutrtp.rtp.RtpZoneManager;
 import io.nightbeam.donutrtp.util.FoliaCompat;
 import io.nightbeam.donutrtp.util.HeadDatabaseService;
+import io.nightbeam.donutrtp.util.ModrinthUpdateChecker;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -22,6 +25,8 @@ public final class DonutRTPPlugin extends JavaPlugin {
     private RtpManager rtpManager;
     private RtpZoneManager rtpZoneManager;
     private WorldGuardHook worldGuardHook;
+    private volatile String updateLatestVersion;
+    private volatile String updateDownloadUrl;
 
     @Override
     public void onEnable() {
@@ -41,6 +46,7 @@ public final class DonutRTPPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(guiManager, this);
         getServer().getPluginManager().registerEvents(new PlayerMoveCancelListener(rtpManager), this);
         getServer().getPluginManager().registerEvents(new RtpZoneListener(rtpZoneManager), this);
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
 
         RtpCommand command = new RtpCommand(configManager, guiManager, rtpZoneManager);
         PluginCommand rtp = getCommand("rtp");
@@ -51,8 +57,16 @@ public final class DonutRTPPlugin extends JavaPlugin {
             getLogger().severe("Command 'rtp' is missing in plugin.yml");
         }
 
+        try {
+            new Metrics(this, 33560);
+        } catch (Throwable t) {
+            getLogger().warning("[DonutRTP] Failed to start bStats metrics: " + t.getMessage());
+        }
+
         getLogger().info("DonutRTP enabled. Folia mode: " + foliaCompat.isFolia()
                 + ", WorldGuard: " + worldGuardHook.isAvailable());
+
+        ModrinthUpdateChecker.checkAsync(this);
     }
 
     @Override
@@ -66,5 +80,37 @@ public final class DonutRTPPlugin extends JavaPlugin {
         if (foliaCompat != null) {
             foliaCompat.shutdown();
         }
+    }
+
+    public FoliaCompat getFoliaCompat() {
+        return foliaCompat;
+    }
+
+    public ConfigManager getConfigManager() {
+        return configManager;
+    }
+
+    public void setUpdateAvailable(String latestVersion, String downloadUrl) {
+        this.updateLatestVersion = latestVersion;
+        this.updateDownloadUrl = downloadUrl;
+    }
+
+    public void clearUpdateAvailable() {
+        this.updateLatestVersion = null;
+        this.updateDownloadUrl = null;
+    }
+
+    public boolean hasUpdateAvailable() {
+        return updateLatestVersion != null && !updateLatestVersion.isBlank();
+    }
+
+    public String getUpdateLatestVersion() {
+        return updateLatestVersion;
+    }
+
+    public String getUpdateDownloadUrl() {
+        return updateDownloadUrl != null
+                ? updateDownloadUrl
+                : "https://modrinth.com/plugin/donut-rtp-and-rtp-zone";
     }
 }

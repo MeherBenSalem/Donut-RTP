@@ -5,7 +5,7 @@ api-version: '1.20'
 folia-supported: true
 softdepend: [HeadDatabase, WorldGuard]
 author: NightBeam
-description: DonutSMP-style RTP GUI for Paper and Folia.
+description: DonutSMP-style RTP GUI for Bukkit, Spigot, Paper, Purpur, and Folia.
 
 commands:
   rtp:

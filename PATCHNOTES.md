@@ -1,5 +1,32 @@
 # DonutRTP Patch Notes
 
+## 1.5.1
+
+### Bug Fixes
+* **RTP zone no longer cancels when you jump.** Countdown tracks the height where it started; jumping in place keeps it running. Walking out still cancels.
+* **"Failed to find a safe location" is far less frequent.** Surface finder scans from the true surface (ignoring leaf canopies) and lands feet on solid ground.
+
+### Platform
+* bStats metrics (plugin ID **33560**)
+* Modrinth update check for [donut-rtp-and-rtp-zone](https://modrinth.com/plugin/donut-rtp-and-rtp-zone) with console warning and `donutrtp.admin` join notify (`update-check.*`)
+* Confirmed support matrix: Bukkit / Spigot / Paper / Purpur / Folia on Minecraft **1.20.1–26.2**
+* Apache-2.0 OSS cleanup (LICENSE, NOTICE, README, contributor docs)
+
+### Behaviour Notes
+* `rtp-zone.countdown.cancel-on-move` only reacts to horizontal movement. Jumping never counts as moving.
+
+### Upgrade Notes
+1. Replace the jar with **1.5.1**. Keep `plugins/DonutRTP/`.
+2. Optional new keys under `update-check` are backfilled by defaults if missing.
+
+---
+
+## 1.5.0
+
+Store release covering early zone/safe-location work. Prefer **1.5.1** for the complete jump-tolerant countdown, safer landings, bStats, and update check.
+
+---
+
 ## 1.4.0
 
 ### New Features

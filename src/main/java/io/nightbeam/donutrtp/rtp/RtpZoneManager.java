@@ -24,6 +24,9 @@ public final class RtpZoneManager {
     private final WorldGuardHook worldGuardHook;
 
     private final Map<UUID, ZoneCountdownTask> activeCountdowns = new HashMap<>();
+    // Block Y where each player's countdown began. Used so that purely vertical
+    // movement (jumping in place) does not cancel the countdown.
+    private final Map<UUID, Integer> countdownAnchorY = new HashMap<>();
     private final Set<UUID> playersInsideWorldGuardZone = new HashSet<>();
     private final Set<UUID> playersInsideLegacyZone = new HashSet<>();
     private Map<String, List<RtpZoneSettings>> legacyZonesByWorld = Map.of();
@@ -103,6 +106,7 @@ public final class RtpZoneManager {
         UUID id = player.getUniqueId();
         playersInsideWorldGuardZone.remove(id);
         playersInsideLegacyZone.remove(id);
+        countdownAnchorY.remove(id);
         cancelCountdown(player, false);
     }
 
@@ -115,6 +119,7 @@ public final class RtpZoneManager {
     private void shutdownCountdownsOnly() {
         activeCountdowns.values().forEach(task -> task.cancel(false));
         activeCountdowns.clear();
+        countdownAnchorY.clear();
     }
 
     private void handleActiveCountdownMove(
@@ -126,24 +131,40 @@ public final class RtpZoneManager {
     ) {
         if (useWorldGuardPath) {
             WorldGuardZoneSettings wg = settings.worldGuardZone();
-            boolean stillInside = isInsideWorldGuardZone(to, wg);
-            if (!stillInside) {
+            if (!stillInsideWorldGuardIgnoringJump(to, wg, player.getUniqueId())) {
                 playersInsideWorldGuardZone.remove(player.getUniqueId());
                 cancelCountdown(player, true);
                 return;
             }
-            if (wg.cancelOnMove() && blockChanged(from, to)) {
+            // Jumping is vertical-only movement and must not count as "moving".
+            if (wg.cancelOnMove() && horizontalBlockChanged(from, to)) {
                 cancelCountdown(player, true);
             }
             return;
         }
 
-        // Legacy cuboid: leave zone cancels
-        RtpZoneSettings zone = findLegacyZoneAt(to, settings);
-        if (zone == null) {
+        // Legacy cuboid: leaving the zone footprint cancels, but jumping in
+        // place (vertical-only) is tolerated via the anchor height.
+        if (!stillInsideLegacyIgnoringJump(to, settings, player.getUniqueId())) {
             playersInsideLegacyZone.remove(player.getUniqueId());
             cancelCountdown(player, true);
         }
+    }
+
+    private boolean stillInsideWorldGuardIgnoringJump(Location to, WorldGuardZoneSettings wg, UUID playerId) {
+        if (isInsideWorldGuardZone(to, wg)) {
+            return true;
+        }
+        Integer anchorY = countdownAnchorY.get(playerId);
+        return anchorY != null && isInsideWorldGuardZone(atHeight(to, anchorY), wg);
+    }
+
+    private boolean stillInsideLegacyIgnoringJump(Location to, Settings settings, UUID playerId) {
+        if (findLegacyZoneAt(to, settings) != null) {
+            return true;
+        }
+        Integer anchorY = countdownAnchorY.get(playerId);
+        return anchorY != null && findLegacyZoneAt(atHeight(to, anchorY), settings) != null;
     }
 
     private void handleWorldGuardMove(Player player, Location from, Location to, WorldGuardZoneSettings wg) {
@@ -251,20 +272,26 @@ public final class RtpZoneManager {
         }
 
         UUID playerId = player.getUniqueId();
+        int anchorY = player.getLocation().getBlockY();
+        countdownAnchorY.put(playerId, anchorY);
         ZoneCountdownTask task = new ZoneCountdownTask(
                 foliaCompat,
                 configManager,
                 configManager.settings().actionBarCooldownSound(),
                 player,
                 wg.countdownSeconds(),
-                () -> isInsideWorldGuardZone(player.getLocation(), configManager.settings().worldGuardZone()),
+                () -> stillInsideWorldGuardIgnoringJump(
+                        player.getLocation(), configManager.settings().worldGuardZone(), playerId),
                 teleport,
                 () -> player.sendMessage(configManager.zoneMessage(
                         wg.messageCountdownCancelled(),
                         "zone-countdown-cancelled",
                         Map.of()
                 )),
-                () -> activeCountdowns.remove(playerId)
+                () -> {
+                    activeCountdowns.remove(playerId);
+                    countdownAnchorY.remove(playerId);
+                }
         );
         activeCountdowns.put(playerId, task);
         task.start();
@@ -288,16 +315,22 @@ public final class RtpZoneManager {
         }
 
         UUID playerId = player.getUniqueId();
+        int anchorY = player.getLocation().getBlockY();
+        countdownAnchorY.put(playerId, anchorY);
         ZoneCountdownTask task = new ZoneCountdownTask(
                 foliaCompat,
                 configManager,
                 configManager.settings().actionBarCooldownSound(),
                 player,
                 zone.countdownSeconds(),
-                () -> zone.contains(player.getLocation()),
+                () -> zone.contains(player.getLocation())
+                        || zone.contains(atHeight(player.getLocation(), anchorY)),
                 () -> rtpManager.teleportRandom(player, zone.worldType()),
                 () -> player.sendMessage(configManager.message("zone-countdown-cancelled")),
-                () -> activeCountdowns.remove(playerId)
+                () -> {
+                    activeCountdowns.remove(playerId);
+                    countdownAnchorY.remove(playerId);
+                }
         );
         activeCountdowns.put(playerId, task);
         task.start();
@@ -333,5 +366,31 @@ public final class RtpZoneManager {
         return from.getBlockX() != to.getBlockX()
                 || from.getBlockY() != to.getBlockY()
                 || from.getBlockZ() != to.getBlockZ();
+    }
+
+    /**
+     * Horizontal (X/Z) block movement only. Jumping changes just the Y block,
+     * so it must not be treated as the player walking away.
+     */
+    private static boolean horizontalBlockChanged(Location from, Location to) {
+        if (from == null || to == null) {
+            return true;
+        }
+        return from.getBlockX() != to.getBlockX()
+                || from.getBlockZ() != to.getBlockZ();
+    }
+
+    /**
+     * Copies {@code base} but sets the Y to the given block height (centred).
+     * Lets zone containment be re-tested at the countdown anchor height, so a
+     * player who only jumped is still considered inside the zone.
+     */
+    private static Location atHeight(Location base, int blockY) {
+        if (base == null) {
+            return null;
+        }
+        Location probe = base.clone();
+        probe.setY(blockY + 0.5D);
+        return probe;
     }
 }
