@@ -2,6 +2,7 @@ package io.nightbeam.donutrtp.config;
 
 import io.nightbeam.donutrtp.rtp.WorldType;
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -328,15 +329,13 @@ public final class ConfigManager {
         int countdownSeconds = Math.max(0, config.getInt("rtp-zone.countdown.seconds", 5));
         boolean cancelOnMove = config.getBoolean("rtp-zone.countdown.cancel-on-move", false);
 
-        WorldType destination = WorldType.OVERWORLD;
         String destRaw = config.getString("rtp-zone.destination-world-type", "OVERWORLD");
-        try {
-            destination = WorldType.valueOf(destRaw.trim().toUpperCase());
-        } catch (IllegalArgumentException ex) {
+        WorldType destination = WorldType.fromString(destRaw).orElseGet(() -> {
             plugin.getLogger().warning(
                     "Invalid rtp-zone.destination-world-type '" + destRaw + "', using OVERWORLD"
             );
-        }
+            return WorldType.OVERWORLD;
+        });
 
         return new WorldGuardZoneSettings(
                 enabled,
@@ -456,22 +455,57 @@ public final class ConfigManager {
         }
 
         String trimmed = raw.trim();
-        try {
-            return Sound.valueOf(trimmed.toUpperCase());
-        } catch (IllegalArgumentException ignored) {
-            // Try registry lookup below.
-        }
-
-        NamespacedKey key = NamespacedKey.fromString(trimmed.contains(":") ? trimmed : "minecraft:" + trimmed);
-        if (key != null) {
-            Sound registrySound = Registry.SOUNDS.get(key);
-            if (registrySound != null) {
-                return registrySound;
-            }
+        Sound resolved = lookupSound(trimmed);
+        if (resolved != null) {
+            return resolved;
         }
 
         plugin.getLogger().warning("Invalid " + label + " sound '" + raw + "', using default " + fallback);
         return fallback;
+    }
+
+    /**
+     * Paper 26.3 marks {@code Sound.valueOf} for removal. Prefer the registry, then
+     * reflectively call {@code valueOf} so 1.20.x Bukkit/Spigot still resolve enum names.
+     */
+    private static Sound lookupSound(String trimmed) {
+        Sound fromRegistry = lookupSoundRegistry(trimmed);
+        if (fromRegistry != null) {
+            return fromRegistry;
+        }
+        return lookupSoundLegacyValueOf(trimmed);
+    }
+
+    private static Sound lookupSoundRegistry(String trimmed) {
+        try {
+            for (String candidate : SoundNames.keyCandidates(trimmed)) {
+                NamespacedKey key = NamespacedKey.fromString(candidate);
+                if (key == null) {
+                    continue;
+                }
+                Sound registrySound = Registry.SOUNDS.get(key);
+                if (registrySound != null) {
+                    return registrySound;
+                }
+            }
+        } catch (Throwable ignored) {
+            // Registry.SOUNDS is absent on some 1.20.x Bukkit/Spigot builds.
+        }
+        return null;
+    }
+
+    private static Sound lookupSoundLegacyValueOf(String trimmed) {
+        String enumName = SoundNames.enumName(trimmed);
+        try {
+            Method valueOf = Sound.class.getMethod("valueOf", String.class);
+            Object value = valueOf.invoke(null, enumName);
+            if (value instanceof Sound sound) {
+                return sound;
+            }
+        } catch (Throwable ignored) {
+            // Sound is an interface on modern Paper; valueOf may be missing later.
+        }
+        return null;
     }
 
     private float clamp(double value, double min, double max) {
@@ -486,7 +520,7 @@ public final class ConfigManager {
             int defaultMinY
     ) {
         String worldName = config.getString(path + ".world-name", defaultWorld);
-        int radius = Math.max(1, config.getInt(path + ".radius", defaultRadius));
+        int radius = config.getInt(path + ".radius", defaultRadius);
         int minY = config.getInt(path + ".min-y", defaultMinY);
         return new WorldSettings(worldName, radius, minY);
     }
@@ -507,36 +541,21 @@ public final class ConfigManager {
                 continue;
             }
 
-            String worldTypeRaw = config.getString(path + ".world-type", "OVERWORLD");
-            WorldType worldType;
-            try {
-                worldType = WorldType.valueOf(worldTypeRaw.trim().toUpperCase());
-            } catch (IllegalArgumentException ex) {
-                plugin.getLogger().warning(
-                        "Invalid world-type '" + worldTypeRaw + "' for RTP zone '" + id + "', skipping"
-                );
-                continue;
-            }
-
-            int countdown = Math.max(1, config.getInt(path + ".countdown-seconds", 10));
-            double halfSizeX = Math.max(0.5, config.getDouble(path + ".half-size-x", 1.0));
-            double halfSizeY = Math.max(0.5, config.getDouble(path + ".half-size-y", 1.0));
-            double halfSizeZ = Math.max(0.5, config.getDouble(path + ".half-size-z", 1.0));
-
-            zones.add(new RtpZoneSettings(
+            RtpZoneParser.parse(
                     id,
                     enabled,
-                    world.trim(),
+                    world,
+                    config.getString(path + ".world-type", "OVERWORLD"),
                     config.getDouble(path + ".x"),
                     config.getDouble(path + ".y"),
                     config.getDouble(path + ".z"),
-                    halfSizeX,
-                    halfSizeY,
-                    halfSizeZ,
-                    countdown,
-                    worldType,
-                    config.getString(path + ".permission")
-            ));
+                    config.getDouble(path + ".half-size-x", 1.0),
+                    config.getDouble(path + ".half-size-y", 1.0),
+                    config.getDouble(path + ".half-size-z", 1.0),
+                    config.getInt(path + ".countdown-seconds", 10),
+                    config.getString(path + ".permission"),
+                    msg -> plugin.getLogger().warning(msg)
+            ).ifPresent(zones::add);
         }
         return List.copyOf(zones);
     }

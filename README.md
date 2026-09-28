@@ -17,7 +17,8 @@ for Bukkit, Spigot, Paper, Purpur, and Folia.
 ## Requirements
 
 - Java 21+
-- Minecraft **1.20.1 through 26.2** (including 1.21.x and 26.1.x)
+- Minecraft **1.20.1 through 26.3** (including 1.21.x, 26.1.x, and 26.2)
+- The plugin jar targets Java 21. Paper / Folia 26.x servers themselves require Java 25.
 - Software: **Bukkit, Spigot, Paper, Purpur, or Folia**
 - Optional: WorldGuard, HeadDatabase
 
