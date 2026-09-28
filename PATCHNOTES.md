@@ -1,5 +1,18 @@
 # DonutRTP Patch Notes
 
+## 1.5.2
+
+### Platform
+* Minecraft **26.3** support (Paper API `26.3.build.49-alpha`, the latest published 26.3 API artifact)
+* Tested on Paper **26.3 ALPHA build #133**
+* Existing support for 1.20.1–26.2, Folia, Bukkit, Spigot, and Purpur is unchanged (`api-version: 1.20`, `folia-supported: true`)
+
+### Upgrade Notes
+1. Replace the jar with **1.5.2**. Keep `plugins/DonutRTP/`.
+2. Paper / Folia 26.x servers require Java 25; the plugin jar still runs on Java 21 for 1.20.5–1.21.x.
+
+---
+
 ## 1.5.1
 
 ### Bug Fixes

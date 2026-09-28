@@ -22,12 +22,16 @@ public record RtpZoneSettings(
         if (location == null || location.getWorld() == null) {
             return false;
         }
-        if (!location.getWorld().getName().equals(worldName)) {
+        return contains(location.getWorld().getName(), location.getX(), location.getY(), location.getZ());
+    }
+
+    public boolean contains(String world, double x, double y, double z) {
+        if (world == null || !world.equals(worldName)) {
             return false;
         }
-        return Math.abs(location.getX() - centerX) <= halfSizeX
-                && Math.abs(location.getY() - centerY) <= halfSizeY
-                && Math.abs(location.getZ() - centerZ) <= halfSizeZ;
+        return Math.abs(x - centerX) <= halfSizeX
+                && Math.abs(y - centerY) <= halfSizeY
+                && Math.abs(z - centerZ) <= halfSizeZ;
     }
 
     public boolean hasPermission() {

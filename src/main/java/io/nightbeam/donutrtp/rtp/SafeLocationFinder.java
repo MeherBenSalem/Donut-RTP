@@ -75,8 +75,8 @@ public final class SafeLocationFinder {
         }
 
         int radius = worldSettings.radius();
-        int x = ThreadLocalRandom.current().nextInt(-radius, radius + 1);
-        int z = ThreadLocalRandom.current().nextInt(-radius, radius + 1);
+        int x = RandomLocationSampler.nextOffset(radius, ThreadLocalRandom.current());
+        int z = RandomLocationSampler.nextOffset(radius, ThreadLocalRandom.current());
 
         foliaCompat.runAtRegion(world, x >> 4, z >> 4, () -> {
             if (future.isDone()) {
