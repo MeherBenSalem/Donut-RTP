@@ -345,9 +345,9 @@ async function scenes(server) {
     await sleep(2500);
     screenshot('zone-landed-chat');
     const zoneClip = await countdown;
-    // Look from the eyes at Kiri's chest: the spread can put Kiri a few blocks below or above.
+    // Look from the eyes at Kiri's eyes: the spread can put Kiri a few blocks below or above, or right beside.
     const [, kx, ky, kz] = (await server.lab(`pos ${FRIEND}`)).match(/^pos \S+ \S+ (-?[\d.]+) (-?[\d.]+) (-?[\d.]+)/);
-    server.command(`execute as ${PLAYER} at @s anchored eyes facing ${kx} ${Number(ky) + 1} ${kz} run tp @s ~ ~ ~ ~ ~`);
+    server.command(`execute as ${PLAYER} at @s anchored eyes facing ${kx} ${Number(ky) + 1.5} ${kz} run tp @s ~ ~ ~ ~ ~`);
     await sleep(40_000);
     const after = record('zone-landed', 3);
     await sleep(1500);
