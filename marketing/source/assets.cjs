@@ -15,19 +15,19 @@ const HEADERS = {
 const MEASURED = path.join(__dirname, 'crops.json');
 const CROP = Object.assign({
   // The title and action bar of the warmup, the boss bar and title of a group countdown, and chat lines.
-  'warmup-scene': [320, 150, 1280, 840],
+  'warmup-scene': [0, 110, 1700, 956],
   'zone-scene': [240, 0, 1440, 900],
-  'landed-chat-line': [0, 905, 1150, 70],
-  'cooldown-chat-line': [0, 905, 1150, 70],
-  'zone-landed-chat-line': [0, 870, 1150, 105],
-  'zone-info-chat': [0, 640, 1150, 335],
+  'landed-chat-line': [0, 932, 1000, 30],
+  'cooldown-chat-line': [0, 932, 1000, 30],
+  'zone-landed-chat-line': [0, 905, 1000, 57],
+  'zone-info-chat': [0, 797, 1000, 165],
   'overworld-view': [0, 0, 1920, 1080],
   'nether-view': [0, 0, 1920, 1080],
   'end-view': [0, 0, 1920, 1080],
   'zone-landed-view': [0, 0, 1920, 1080],
 }, fs.existsSync(MEASURED) ? JSON.parse(fs.readFileSync(MEASURED, 'utf8')) : {});
 const FILES = {
-  'warmup-scene': 'warmup', 'zone-scene': 'zone-countdown', 'landed-chat-line': 'landed-chat', 'cooldown-chat-line': 'cooldown-chat',
+  'warmup-scene': 'warmup-2', 'zone-scene': 'zone-countdown', 'landed-chat-line': 'landed-chat', 'cooldown-chat-line': 'cooldown-chat',
   'zone-landed-chat-line': 'zone-landed-chat', 'zone-info-chat': 'zone-info', 'zone-landed-view': 'zone-landed',
 };
 
@@ -79,7 +79,7 @@ const assets = {
     ${r.sprinkles(60, 0.4)}
     <div style="position:absolute;left:880px;top:-40px;width:1120px;height:700px;perspective:1700px">
       <div style="transform:rotateY(-17deg) rotateX(4deg) translateZ(0);transform-origin:left center;margin-top:70px">
-        ${shotArt('menu-overworld', 800, 470)}
+        ${shotArt('menu', 800, 330, 'display:inline-block')}
       </div>
     </div>
     <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(14,10,20,.95) 0%,rgba(14,10,20,.86) 40%,rgba(14,10,20,.15) 62%,rgba(14,10,20,0) 100%)"></div>
@@ -106,8 +106,11 @@ const assets = {
       'Any item, HeadDatabase or custom heads as icons',
     ],
     art: `<div style="position:relative;height:780px">
-      ${main('menu-overworld', 850, 450, 40, '/rtp')}
-      ${inset('menu-nether-tip', 330, 260, 0, 'A paid destination')}
+      ${main('menu', 850, 360, 40, '/rtp')}
+      <div style="position:absolute;left:0;bottom:0">${shotArt('menu-nether-tip', 400, 200)}</div>
+      ${r.label('A paid destination', 'left:24px;bottom:178px', 'gold')}
+      <div style="position:absolute;right:-20px;bottom:0">${shotArt('menu-end-tip', 430, 200)}</div>
+      ${r.label('Locked without its permission', 'right:-2px;bottom:178px', 'gold')}
     </div>`,
   })),
 
@@ -134,7 +137,7 @@ const assets = {
       'Solo zones too, with a cooldown and permission per zone',
     ],
     art: `<div style="position:relative;height:780px">
-      ${main('zone-scene', 850, 520, 40, 'A group countdown')}
+      ${main('zone-scene', 850, 520, 40, '')}
       ${inset('zone-landed-chat-line', 760, 100, 30, 'Two players, one landing')}
     </div>`,
   })),

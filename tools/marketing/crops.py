@@ -17,7 +17,7 @@ OUT = ROOT / "marketing/source/crops.json"
 W, H, SCALE = 1920, 1080, 3
 
 # Screenshot: rows of the open chest menu.
-MENUS = {"menu-overworld": 3, "menu-nether": 3, "menu-end": 3, "menu-cooldown": 3}
+MENUS = {"menu": 3, "menu-overworld": 3, "menu-nether": 3, "menu-end": 3, "menu-cooldown": 3}
 
 # Screenshots that also get a crop of the tooltip alone ("<name>-tip").
 TOOLTIP_ONLY = {"menu-nether", "menu-end", "menu-cooldown"}

@@ -254,6 +254,10 @@ async function scenes(server) {
   await sleep(300);
   await server.lab(`sudo ${PLAYER} rtp`);
   await sleep(2500);
+  // The whole menu, the cursor parked away from every item.
+  x('move', 60, 60);
+  await sleep(900);
+  screenshot('menu');
   await hover(11);
   screenshot('menu-overworld');
   await hover(13, 3, 1600);
