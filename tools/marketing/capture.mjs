@@ -99,7 +99,7 @@ function writeClientOptions() {
   fs.writeFileSync(path.join(clientDir, 'options.txt'), [
     'version:4671', 'guiScale:3', 'renderDistance:10', 'simulationDistance:5', 'maxFps:30', 'graphicsMode:1',
     'pauseOnLostFocus:false', 'narrator:0', 'tutorialStep:none', 'skipMultiplayerWarning:true', 'joinedFirstServer:true',
-    'onboardAccessibility:false', 'lang:en_us', 'fov:0.0', 'bobView:false', 'chatScale:1.0', 'chatWidth:1.0',
+    'onboardAccessibility:false', 'lang:en_us', 'gamma:1.0', 'fov:0.0', 'bobView:false', 'chatScale:1.0', 'chatWidth:1.0',
     'soundCategory_master:0.0', 'darkMojangStudiosBackground:true', 'hideServerAddress:true', 'renderClouds:"fancy"',
     'entityShadows:true', 'particles:0', 'mipmapLevels:4', 'ao:true', 'menuBackgroundBlurriness:3',
   ].join('\n') + '\n');
@@ -345,8 +345,9 @@ async function scenes(server) {
     await sleep(2500);
     screenshot('zone-landed-chat');
     const zoneClip = await countdown;
-    // Face Kiri, looking a little down so both landing spots are in view.
-    server.command(`execute as ${PLAYER} at @s facing entity ${FRIEND} feet run tp @s ~ ~ ~ ~ 14`);
+    // Look from the eyes at Kiri's chest: the spread can put Kiri a few blocks below or above.
+    const [, kx, ky, kz] = (await server.lab(`pos ${FRIEND}`)).match(/^pos \S+ \S+ (-?[\d.]+) (-?[\d.]+) (-?[\d.]+)/);
+    server.command(`execute as ${PLAYER} at @s anchored eyes facing ${kx} ${Number(ky) + 1} ${kz} run tp @s ~ ~ ~ ~ ~`);
     await sleep(40_000);
     const after = record('zone-landed', 3);
     await sleep(1500);
