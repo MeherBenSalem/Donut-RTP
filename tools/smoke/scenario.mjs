@@ -179,13 +179,20 @@ export async function scenario({ server, target, hooks, joinBot, step }) {
       // A flat floor near spawn, so walking always reaches the next block.
       await server.lab('platform world 40 120 40');
       await server.lab('tp Walker world 40.5 120 40.5');
-      await sleep(2_000);
+      // Walk only once the client agrees it is on the platform; before that the server rejects its moves.
+      const onPlatform = () => Math.abs(walker.entity.position.x - 40.5) < 1 && Math.abs(walker.entity.position.z - 40.5) < 1
+        && Math.abs(walker.entity.position.y - 120) < 1.5;
+      for (let i = 0; i < 100 && !onPlatform(); i++) await sleep(100);
+      if (!onPlatform()) throw new Error(`the bot never reached the platform: ${walker.entity.position}`);
+      await sleep(1_500);
       walker.chat('/rtp overworld');
       await chat(walker, /Teleporting in/);
       walker.setControlState('forward', true);
-      await sleep(600);
-      walker.setControlState('forward', false);
-      await chat(walker, /cancelled because you moved/);
+      try {
+        await chat(walker, /cancelled because you moved/, 1_800);
+      } finally {
+        walker.setControlState('forward', false);
+      }
       await sleep(1_500);
       server.mark();
       walker.chat('/rtp overworld');
