@@ -250,6 +250,7 @@ export async function scenario({ server, target, hooks, joinBot, step }) {
     groupSpot = a;
     const apart = Math.max(Math.abs(a.x - b.x), Math.abs(a.z - b.z));
     if (a.world !== b.world || apart > 9) throw new Error(`${describe(a)} vs ${describe(b)}`);
+    if (Math.floor(a.x) === Math.floor(b.x) && Math.floor(a.z) === Math.floor(b.z)) throw new Error(`both on one block: ${describe(a)}`);
     if (!safe(a) || !safe(b)) throw new Error(`unsafe: ${describe(a)} / ${describe(b)}`);
     return `${apart} blocks apart at ${describe(a)}`;
   });

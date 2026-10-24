@@ -5,9 +5,12 @@ import io.nightbeam.donutrtp.destination.Destination;
 import io.nightbeam.donutrtp.platform.Platform;
 import io.nightbeam.donutrtp.platform.Scheduler;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -158,8 +161,9 @@ public final class LocationSearch {
     }
 
     /**
-     * Spots for {@code count} players near {@code center}, at most {@code spread} blocks away. Runs on the thread
-     * that owns the centre; columns owned by another region (Folia) or not loaded fall back to the centre.
+     * Spots for {@code count} players near {@code center}, at most {@code spread} blocks away and each on its own
+     * block. Runs on the thread that owns the centre and only reads loaded chunks it owns; every column in reach is
+     * tried, in random order. Players share the centre only when no other safe spot exists.
      */
     public CompletableFuture<List<Location>> spread(Location center, int count, int spread, Destination destination) {
         CompletableFuture<List<Location>> out = new CompletableFuture<>();
@@ -167,26 +171,45 @@ public final class LocationSearch {
         scheduler.region(world, center.getBlockX() >> 4, center.getBlockZ() >> 4, () -> {
             List<Location> spots = new ArrayList<>(count);
             spots.add(center);
-            ThreadLocalRandom random = ThreadLocalRandom.current();
-            for (int i = 1; i < count; i++) {
-                Location spot = null;
-                for (int attempt = 0; spread > 0 && attempt < 6 && spot == null; attempt++) {
-                    int x = center.getBlockX() + random.nextInt(-spread, spread + 1);
-                    int z = center.getBlockZ() + random.nextInt(-spread, spread + 1);
-                    if (!world.isChunkLoaded(x >> 4, z >> 4) || !scheduler.ownsChunk(world, x >> 4, z >> 4)) {
-                        continue;
-                    }
-                    try {
-                        spot = SpotCheck.findNear(world, x, z, center.getBlockY(), destination);
-                    } catch (Throwable e) {
-                        spot = null;
+            Set<Long> used = new HashSet<>();
+            used.add(blockKey(center));
+            List<int[]> offsets = new ArrayList<>();
+            for (int dx = -spread; dx <= spread; dx++) {
+                for (int dz = -spread; dz <= spread; dz++) {
+                    if (dx != 0 || dz != 0) {
+                        offsets.add(new int[]{dx, dz});
                     }
                 }
-                spots.add(spot != null ? spot : center.clone());
+            }
+            Collections.shuffle(offsets, ThreadLocalRandom.current());
+            for (int[] offset : offsets) {
+                if (spots.size() >= count) {
+                    break;
+                }
+                int x = center.getBlockX() + offset[0];
+                int z = center.getBlockZ() + offset[1];
+                if (!world.isChunkLoaded(x >> 4, z >> 4) || !scheduler.ownsChunk(world, x >> 4, z >> 4)) {
+                    continue;
+                }
+                try {
+                    Location spot = SpotCheck.findNear(world, x, z, center.getBlockY(), destination);
+                    if (spot != null && used.add(blockKey(spot))) {
+                        spots.add(spot);
+                    }
+                } catch (Throwable e) {
+                    log.log(Level.FINE, "Could not check a spread spot", e);
+                }
+            }
+            while (spots.size() < count) {
+                spots.add(center.clone());
             }
             out.complete(spots);
         });
         return out;
+    }
+
+    private static long blockKey(Location at) {
+        return ((long) at.getBlockX() & 0x3FFFFFFL) << 38 | ((long) at.getBlockZ() & 0x3FFFFFFL) << 12 | (at.getBlockY() & 0xFFFL);
     }
 
     private void refillOne() {
