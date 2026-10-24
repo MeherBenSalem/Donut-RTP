@@ -1,5 +1,22 @@
 # DonutRTP Patch Notes
 
+## 2.0.0: The Zone Update
+
+A full rewrite. The full notes are in [DonutRTP-2.0.0-PatchNotes.md](DonutRTP-2.0.0-PatchNotes.md).
+
+* **Group RTP zones**: everyone on the pad when the countdown ends lands together. Any number of zones, made in game
+  or from WorldGuard regions.
+* **Any number of destinations**, each with its own world, shape, distance, heights, biome rules, permission,
+  cooldown and Vault cost.
+* **No lag**: asynchronous chunk loading on Paper and Folia, and spots found ahead of time.
+* **Safe landings**: no fall damage after landing; WorldGuard regions and GriefPrevention claims avoided.
+* Saved cooldowns with shorter ones per rank, PlaceholderAPI placeholders, a developer API, and `/rtp <destination>`
+  and `/rtp player`.
+* Fixes for Java 17 servers (1.20.1-1.20.4), Spigot and Folia.
+* 1.x configs and zones upgrade themselves on the first start.
+
+---
+
 ## 1.5.2
 
 ### Platform

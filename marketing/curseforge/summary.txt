@@ -1,0 +1,1 @@
+Free random teleport for Paper, Folia and Spigot 1.20.1-26.3: an /rtp menu for any world and group RTP zones where everyone lands together. No lag, safe landings, claim avoidance, rank cooldowns, Vault costs, PlaceholderAPI.

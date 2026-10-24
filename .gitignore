@@ -28,8 +28,13 @@ Desktop.ini
 # Built artifacts
 *.jar
 !**/gradle-wrapper.jar
-releases/
+# publish.yml looks here first; keep versioned plugin jars tracked
+!releases/*.jar
 dist/
+
+# Smoke matrix and artwork tooling
+node_modules/
+marketing/source/.render-*.html
 
 # Env / secrets
 .env
