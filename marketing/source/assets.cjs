@@ -169,7 +169,8 @@ const assets = {
   safety: card('safety', () => ({
     kicker: 'Safe Landings', title: 'Never into lava',
     points: [
-      'Solid ground, open air: no water, lava, trees or the Nether roof',
+      'Solid ground, open air: no water, trees or the Nether roof',
+      'Never in lava, beside it, or under it',
       '<b class="hi">Never in a WorldGuard region or GriefPrevention claim</b>',
       'Always inside the world border',
       'Biome rules: oceans and rivers off by default',

@@ -69,6 +69,7 @@ spawn_pad` uses a region instead. Every setting changes in game with `/rtpadmin 
 ![Never into lava](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/card-safety.png)
 
 - Never into water, lava, fire, magma, powder snow, cobwebs, berry bushes or cactus.
+- **Never beside lava**, or under lava that would pour down.
 - Never into a tree, the void, or on top of the Nether roof.
 - **Never inside a WorldGuard region or a GriefPrevention claim.**
 - Always inside the **world border**, with a margin.

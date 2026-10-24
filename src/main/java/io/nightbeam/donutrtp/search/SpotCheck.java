@@ -30,6 +30,9 @@ public final class SpotCheck {
     /** Blocks under the surface that are checked in case the top one is snow, a carpet or tall grass. */
     private static final int SURFACE_DEPTH = 4;
 
+    /** How far up the open air over a spot is searched for lava that would pour down on it. */
+    private static final int LAVA_ABOVE = 48;
+
     private SpotCheck() {
     }
 
@@ -91,7 +94,43 @@ public final class SpotCheck {
         if (!clear(world.getBlockAt(x, floorY + 1, z)) || !clear(world.getBlockAt(x, floorY + 2, z))) {
             return null;
         }
+        if (lavaNear(world, x, floorY, z)) {
+            return null;
+        }
         return new Location(world, x + 0.5, floorY + 1, z + 0.5);
+    }
+
+    /**
+     * Whether lava touches the spot or would pour onto it once the chunk ticks (fresh chunks have not let their lava flow
+     * yet): beside the floor, feet, head or the block over the head, or anywhere in the open air above. Only blocks in the
+     * spot's own chunk are read, so no other chunk is loaded or touched from another region's thread.
+     */
+    private static boolean lavaNear(World world, int x, int floorY, int z) {
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dz = -1; dz <= 1; dz++) {
+                int nx = x + dx;
+                int nz = z + dz;
+                if (nx >> 4 != x >> 4 || nz >> 4 != z >> 4) {
+                    continue;
+                }
+                for (int y = floorY; y <= floorY + 3; y++) {
+                    if (world.getBlockAt(nx, y, nz).getType() == Material.LAVA) {
+                        return true;
+                    }
+                }
+            }
+        }
+        int top = Math.min(world.getMaxHeight() - 1, floorY + 3 + LAVA_ABOVE);
+        for (int y = floorY + 4; y <= top; y++) {
+            Block block = world.getBlockAt(x, y, z);
+            if (block.getType() == Material.LAVA) {
+                return true;
+            }
+            if (!block.isPassable()) {
+                break;
+            }
+        }
+        return false;
     }
 
     private static boolean clear(Block block) {

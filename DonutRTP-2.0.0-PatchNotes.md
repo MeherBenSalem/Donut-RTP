@@ -39,6 +39,7 @@ your 1.x setup upgrades itself on the first start.
 - **Claims and regions avoided**: never land inside a WorldGuard region or a GriefPrevention claim.
 - **Never land somewhere unsafe**: water, lava, fire, magma, powder snow, cobwebs, berry bushes, cactus, the Nether
   roof, the void, or a tree.
+- **Never beside lava**, or under lava that would pour down once the chunk starts ticking.
 
 ### Cooldowns, costs and ranks
 - **Cooldowns are saved to disk** and survive restarts.

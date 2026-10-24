@@ -204,6 +204,8 @@ async function scenes(server) {
     server.waitFor(new RegExp(`event teleport ${PLAYER} ${destination} ${source}`), 60_000, `${destination} landing`).then(() => Date.now());
   await server.lab(`money ${PLAYER} 5000`);
   server.command(`recipe give ${PLAYER} *`);
+  // The camera stands still for a minute after each landing; lava flowing in from far off must not end the run.
+  server.command(`effect give ${PLAYER} minecraft:fire_resistance infinite 0 true`);
 
   // An RTP pad in a cherry grove: the zone scenes and the backdrop of every card.
   server.mark();

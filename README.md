@@ -13,8 +13,8 @@ with everyone standing on the pad when the timer runs out. Finding a spot never 
   `/rtp <destination>` skips the menu.
 - **No lag**: chunks load asynchronously on Paper and Folia, and a few safe spots per destination are found ahead of
   time, so most teleports start the moment the warmup ends.
-- **Safe landings**: never in water, lava, fire, powder snow, a tree or the Nether roof. A few seconds without fall
-  damage after landing.
+- **Safe landings**: never in water, lava, fire, powder snow, a tree or the Nether roof, and never beside lava or
+  under it. A few seconds without fall damage after landing.
 - **Group RTP zones**: everyone in the zone when the countdown ends lands together, a few blocks apart. Set a minimum
   number of players. Solo zones start your own countdown when you walk in.
 - **Zones made in game**: `/rtpadmin pos1`, `pos2`, `zone create`. You can also use a WorldGuard region. Countdowns
