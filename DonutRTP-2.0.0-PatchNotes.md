@@ -111,5 +111,6 @@ your 1.x setup upgrades itself on the first start.
 ## Tested
 - 22 unit tests.
 - A bot matrix boots a 1.x install on Paper 1.20.1, 1.20.4, 1.20.6, 1.21.1, 1.21.4, 1.21.8, 1.21.11, 26.1.2, 26.2 and
-  26.3, and Folia 1.20.4, 1.21.4, 1.21.11 and 26.3. On each server it runs 22 checks, from the upgrade and the menu
-  to group zones, WorldGuard, GriefPrevention and Vault, then scans the console for errors.
+  26.3, and Folia 1.20.4, 1.21.4, 1.21.11 and 26.3. On each server it runs up to 23 checks, from the upgrade and the
+  menu to group zones and Vault costs, with WorldGuard and GriefPrevention on Paper. Then it scans the console for
+  errors.

@@ -150,9 +150,9 @@ Replace the jar and restart. DonutRTP upgrades your 1.x setup on the first start
 | Spigot, Bukkit | 1.20.1 – 26.3 | as your server |
 
 One jar for all of them. Each release boots a 1.x install on Paper 1.20.1, 1.20.4, 1.20.6, 1.21.1, 1.21.4, 1.21.8,
-1.21.11, 26.1.2, 26.2 and 26.3 and Folia 1.20.4, 1.21.4, 1.21.11 and 26.3. On each one, bots run 22 checks: the
-upgrade, the menu, warmup cancels, the Nether and the End, a two-player group zone, WorldGuard, GriefPrevention,
-Vault and the admin commands. The console must stay free of errors.
+1.21.11, 26.1.2, 26.2 and 26.3 and Folia 1.20.4, 1.21.4, 1.21.11 and 26.3. On each one, bots run up to 23 checks:
+the upgrade, the menu, warmup cancels, the Nether and the End, rank cooldowns, a two-player group zone, Vault and the
+admin commands, plus WorldGuard and GriefPrevention on Paper. The console must stay free of errors.
 
 ![Commands & Permissions](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/header-commands.png)
 

@@ -25,7 +25,7 @@ it runs `scenario.mjs`:
    or river.
 3. Her next `/rtp` is refused with the time left, and `%donutrtp_cooldown%` shows it.
 4. `Bob` takes damage during the warmup, which cancels it. He then lands in the Nether: under the roof, on safe
-   ground.
+   ground. His rank (`cooldown.ranks.mvp: 5`) makes his next cooldown 5 seconds instead of 30.
 5. `Cara` is teleported away during her warmup, which cancels it. The console sends her to the End with
    `/rtp player`. Fall damage is blocked right after landing and back to normal after six seconds.
 6. On servers the bots can walk on (no ViaBackwards), `Walker` walks off his block (cancel), then jumps in place (no
