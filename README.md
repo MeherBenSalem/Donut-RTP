@@ -100,7 +100,7 @@ the design.
 ## Support
 
 - Discord: <https://discord.gg/SAmd9fhNhr>
-- Issues: [GitHub Issues](https://github.com/MeherBenSalem/donut-rtp/issues)
+- Issues: [GitHub Issues](https://github.com/MeherBenSalem/Donut-RTP/issues)
 - Support the project: <https://nightbeam.dev/support>
 
 Anonymous usage statistics are sent to [bStats](https://bstats.org/plugin/bukkit/DonutRTP/33560); turn them off in

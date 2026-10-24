@@ -11,7 +11,7 @@ Listing copy and artwork for CurseForge, Modrinth and Hangar. Nothing here ships
 | [`images/icon.png`](images/icon.png) | Project avatar |
 | [`../DonutRTP-2.0.0-PatchNotes.md`](../DonutRTP-2.0.0-PatchNotes.md) | File changelog the publish workflow uploads |
 
-Image links in the description point at `raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/...`,
+Image links in the description point at `raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/...`,
 so they work once this folder is on `main`. To host on CurseForge instead, upload the images to the project gallery and
 replace each URL.
 

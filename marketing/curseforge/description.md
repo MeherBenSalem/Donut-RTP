@@ -1,4 +1,4 @@
-![DonutRTP 2.0: The Zone Update](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/banner.png)
+![DonutRTP 2.0: The Zone Update](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/banner.png)
 
 ## Random teleport and RTP zones for survival servers, without the lag
 
@@ -18,13 +18,13 @@ pad, and everyone standing there when the countdown ends **lands together**.
 
 Each release is tested on every supported Paper and Folia version with real clients.
 
-![Two players on an RTP pad: the countdown runs, and they land together](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/gifs/zone.gif)
+![Two players on an RTP pad: the countdown runs, and they land together](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/gifs/zone.gif)
 
-![divider](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/divider.png)
+![divider](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/divider.png)
 
-![The Menu](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/header-menu.png)
+![The Menu](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/header-menu.png)
 
-![Pick where you land](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/card-menu.png)
+![Pick where you land](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/card-menu.png)
 
 - **One item per destination**, as many as you like, in any slot of a one to six row menu.
 - Each item shows **your cooldown** ("Available in 4m 12s"), **the cost**, or **a lock** when you lack the
@@ -32,9 +32,9 @@ Each release is tested on every supported Paper and Folia version with real clie
 - `/rtp nether` skips the menu. Tab completion lists only the destinations you may use.
 - Icons can be any item, a **HeadDatabase** head (`hdb-1234`), or a player head from a texture, a UUID or a name.
 
-![Teleporting](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/header-teleporting.png)
+![Teleporting](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/header-teleporting.png)
 
-![Stand still, then go](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/card-warmup.png)
+![Stand still, then go](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/card-warmup.png)
 
 1. Pick a destination. The warmup counts down on the action bar, a title, or both.
 2. Walking off your block or taking damage cancels it. **Jumping in place never does.**
@@ -45,9 +45,9 @@ Each release is tested on every supported Paper and Folia version with real clie
 Ops and anyone with `donutrtp.warmup.bypass` skip the warmup. `/rtp player <name> [destination]` lets staff send
 someone with no warmup, cooldown or cost.
 
-![RTP Zones](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/header-zones.png)
+![RTP Zones](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/header-zones.png)
 
-![Land together](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/card-zones.png)
+![Land together](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/card-zones.png)
 
 - **Group zones**: one countdown for everyone on the pad. When it ends, everyone still inside lands together, a few
   blocks apart.
@@ -58,15 +58,15 @@ someone with no warmup, cooldown or cost.
 - Hologram and scoreboard timers through PlaceholderAPI: `%donutrtp_zone_spawn_countdown%`,
   `%donutrtp_zone_spawn_players%`.
 
-![Zones made in game](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/card-zone-admin.png)
+![Zones made in game](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/card-zone-admin.png)
 
 Stand on one corner and type `/rtpadmin pos1`, stand on the other and type `/rtpadmin pos2`, then
 `/rtpadmin zone create spawn overworld`. That's it. Using WorldGuard? `/rtpadmin zone create spawn overworld region
 spawn_pad` uses a region instead. Every setting changes in game with `/rtpadmin zone set`, without a restart.
 
-![Safe Landings](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/header-safety.png)
+![Safe Landings](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/header-safety.png)
 
-![Never into lava](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/card-safety.png)
+![Never into lava](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/card-safety.png)
 
 - Never into water, lava, fire, magma, powder snow, cobwebs, berry bushes or cactus.
 - Never into a tree, the void, or on top of the Nether roof.
@@ -74,9 +74,9 @@ spawn_pad` uses a region instead. Every setting changes in game with `/rtpadmin 
 - Always inside the **world border**, with a margin.
 - **Biome rules** per destination. Oceans and rivers are denied in the Overworld by default.
 
-![No Lag](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/header-performance.png)
+![No Lag](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/header-performance.png)
 
-![Built not to lag](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/card-performance.png)
+![Built not to lag](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/card-performance.png)
 
 Loading a chunk far from everything else is the expensive part of any random teleport.
 - On **Paper and Folia**, DonutRTP loads chunks asynchronously. Chunks for a waiting player load first, and each
@@ -86,9 +86,9 @@ Loading a chunk far from everything else is the expensive part of any random tel
 - On **Spigot**, at most one chunk loads per tick.
 - When a search finds nothing, the console says why: no safe ground, denied biomes, claims, or a busy server.
 
-![Destinations](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/header-destinations.png)
+![Destinations](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/header-destinations.png)
 
-![Any world, any shape](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/card-destinations.png)
+![Any world, any shape](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/card-destinations.png)
 
 Add as many destinations as you like: a resource world, a "far lands" option for veterans, a VIP-only world. Each one
 has its own:
@@ -97,9 +97,9 @@ has its own:
 - biome allow and deny lists;
 - permission, cooldown, cost and menu item.
 
-![Cooldowns & Costs](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/header-cooldowns.png)
+![Cooldowns & Costs](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/header-cooldowns.png)
 
-![Cooldowns, ranks and costs](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/card-cooldowns.png)
+![Cooldowns, ranks and costs](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/card-cooldowns.png)
 
 - **Cooldowns are saved** and survive restarts.
 - One cooldown for every destination, or one each.
@@ -108,9 +108,9 @@ has its own:
 - **Costs through Vault**, taken only once the player has landed, and refunded if the teleport fails.
 - Bypass permissions for cooldowns, costs and the warmup.
 
-![Integrations](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/header-integrations.png)
+![Integrations](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/header-integrations.png)
 
-![Plays well with others](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/card-integrations.png)
+![Plays well with others](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/card-integrations.png)
 
 All of these are optional:
 
@@ -127,9 +127,9 @@ All of these are optional:
 - `RtpTeleportEvent` fires after landing.
 - Both say which destination and what started the teleport: command, menu, admin or zone.
 
-![Upgrading from 1.x](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/header-upgrade.png)
+![Upgrading from 1.x](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/header-upgrade.png)
 
-![Upgrade in place](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/card-upgrade.png)
+![Upgrade in place](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/card-upgrade.png)
 
 Replace the jar and restart. DonutRTP upgrades your 1.x setup on the first start:
 - **Your settings carry over**: warmup, cooldown, worlds, radius, minimum height, sounds and menu items.
@@ -137,9 +137,9 @@ Replace the jar and restart. DonutRTP upgrades your 1.x setup on the first start
   its name and permission.
 - The old files are kept as `config-1.x.yml` and `messages-1.x.yml`.
 
-![Compatibility](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/header-compatibility.png)
+![Compatibility](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/header-compatibility.png)
 
-![Tested on every version](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/card-compatibility.png)
+![Tested on every version](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/card-compatibility.png)
 
 | Server | Minecraft | Java |
 | --- | --- | --- |
@@ -154,7 +154,7 @@ One jar for all of them. Each release boots a 1.x install on Paper 1.20.1, 1.20.
 upgrade, the menu, warmup cancels, the Nether and the End, a two-player group zone, WorldGuard, GriefPrevention,
 Vault and the admin commands. The console must stay free of errors.
 
-![Commands & Permissions](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/header-commands.png)
+![Commands & Permissions](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/header-commands.png)
 
 | Command | Permission | |
 | --- | --- | --- |
@@ -171,7 +171,7 @@ Vault and the admin commands. The console must stay free of errors.
 `donutrtp.zone.use` lets players use zones (everyone). `donutrtp.cooldown.bypass` and `donutrtp.cost.bypass` are
 for ops. `donutrtp.warmup.bypass` is given to nobody by default. `/donutrtp` works as `/rtpadmin`.
 
-![Questions](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/header-faq.png)
+![Questions](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/header-faq.png)
 
 **Does it lag?** On Paper and Folia, chunks load off the main thread, and ready spots are prepared ahead of time.
 Generating new terrain still costs CPU, as it does for every RTP plugin. Pre-generating your world makes every
@@ -189,20 +189,20 @@ teleport cheap.
 **"No safe spot was found"?** The console says why. Usually the area is mostly ocean, or claims cover it. A larger
 radius helps.
 
-![Gallery](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/header-gallery.png)
+![Gallery](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/header-gallery.png)
 
-![The menu](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/screenshots/menu-overworld.jpg)
+![The menu](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/screenshots/menu-overworld.jpg)
 
-![The countdown on a group zone](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/screenshots/zone-countdown.jpg)
+![The countdown on a group zone](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/screenshots/zone-countdown.jpg)
 
-![Landed together](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/screenshots/zone-landed.jpg)
+![Landed together](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/screenshots/zone-landed.jpg)
 
-![A Nether landing](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/screenshots/nether-view.jpg)
+![A Nether landing](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/screenshots/nether-view.jpg)
 
-![An End landing](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/screenshots/end-view.jpg)
+![An End landing](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/screenshots/end-view.jpg)
 
-![divider](https://raw.githubusercontent.com/MeherBenSalem/donut-rtp/main/marketing/images/divider.png)
+![divider](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/divider.png)
 
 **Discord**: [discord.gg/SAmd9fhNhr](https://discord.gg/SAmd9fhNhr) · **Source**:
-[GitHub](https://github.com/MeherBenSalem/donut-rtp) (Apache 2.0) · **Support the project**:
+[GitHub](https://github.com/MeherBenSalem/Donut-RTP) (Apache 2.0) · **Support the project**:
 [nightbeam.dev/support](https://nightbeam.dev/support)
