@@ -179,9 +179,10 @@ export async function scenario({ server, target, hooks, joinBot, step }) {
       // A flat floor near spawn, so walking always reaches the next block.
       await server.lab('platform world 40 120 40');
       await server.lab('tp Walker world 40.5 120 40.5');
-      // Walk only once the client agrees it is on the platform; before that the server rejects its moves.
+      // Walk only once the client agrees it is on the platform and has the platform's chunk (mineflayer does not move a
+      // bot over blocks it has not received); before that the server rejects its moves.
       const onPlatform = () => Math.abs(walker.entity.position.x - 40.5) < 1 && Math.abs(walker.entity.position.z - 40.5) < 1
-        && Math.abs(walker.entity.position.y - 120) < 1.5;
+        && Math.abs(walker.entity.position.y - 120) < 1.5 && walker.blockAt(walker.entity.position.offset(1, -1, 0))?.name === 'stone';
       for (let i = 0; i < 100 && !onPlatform(); i++) await sleep(100);
       if (!onPlatform()) throw new Error(`the bot never reached the platform: ${walker.entity.position}`);
       await sleep(1_500);
