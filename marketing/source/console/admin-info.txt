@@ -1,0 +1,6 @@
+DonutRTP 2.0.0 - Paper (async chunks: true, async teleport: true)
+Hooks: WorldGuard no, GriefPrevention no, Vault yes, PlaceholderAPI yes
+overworld world square 300-5000 ready spots: 3
+nether world_nether square 100-4000 ready spots: 3
+end world_the_end circle 1100-3000 ready spots: 3
+zone spawn group -> overworld players: 0

@@ -150,7 +150,8 @@ public final class RtpLabPlugin extends JavaPlugin {
                     int x = Integer.parseInt(args[2]);
                     int z = Integer.parseInt(args[3]);
                     Bukkit.getRegionScheduler().run(this, world, x >> 4, z >> 4,
-                            task -> report("surface " + x + " " + z + " " + world.getHighestBlockYAt(x, z)));
+                            task -> report("surface " + x + " " + z + " "
+                                    + world.getHighestBlockYAt(x, z, org.bukkit.HeightMap.MOTION_BLOCKING_NO_LEAVES)));
                 }
                 default -> report("error unknown " + sub);
             }

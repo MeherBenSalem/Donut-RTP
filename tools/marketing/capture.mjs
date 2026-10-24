@@ -194,12 +194,6 @@ async function main() {
   }
 }
 
-const feet = async (server, who) => {
-  const line = await server.lab(`pos ${who}`);
-  const m = line.match(/^pos \S+ (\S+) (-?[\d.]+) (-?[\d.]+) (-?[\d.]+)/);
-  return { world: m[1], x: Math.floor(Number(m[2])), y: Math.floor(Number(m[3])), z: Math.floor(Number(m[4])) };
-};
-
 async function scenes(server) {
   await server.lab(`money ${PLAYER} 5000`);
   server.command(`recipe give ${PLAYER} *`);
@@ -210,17 +204,28 @@ async function scenes(server) {
   const located = await server.waitFor(/cherry_grove is at \[(-?\d+), [^,]+, (-?\d+)\]/, 120_000, 'locate');
   server.command(`spreadplayers ${located[1]} ${located[2]} 0 1 false ${PLAYER}`);
   await sleep(2500);
-  const pad = await feet(server, PLAYER);
-  const { x: px, y: py, z: pz } = pad;
+  const ground = await server.lab(`surface world ${located[1]} ${located[2]}`);
+  const px = Number(located[1]);
+  const pz = Number(located[2]);
+  const py = Number(ground.split(' ').at(-1)) + 1;
+  // Every chunk of the pad must be loaded, or /fill refuses ("That position is not loaded").
+  server.command(`forceload add ${px - 8} ${pz - 8} ${px + 8} ${pz + 8}`);
+  await sleep(4000);
   for (const command of [
-    `fill ${px - 4} ${py} ${pz - 4} ${px + 4} ${py + 5} ${pz + 4} air`,
+    `fill ${px - 5} ${py} ${pz - 5} ${px + 5} ${py + 7} ${pz + 5} air`,
+    `fill ${px - 4} ${py - 2} ${pz - 4} ${px + 4} ${py - 2} ${pz + 4} dirt`,
     `fill ${px - 3} ${py - 1} ${pz - 3} ${px + 3} ${py - 1} ${pz + 3} purpur_block`,
     `fill ${px - 2} ${py - 1} ${pz - 2} ${px + 2} ${py - 1} ${pz + 2} amethyst_block`,
     `setblock ${px} ${py - 1} ${pz} crying_obsidian`,
     `setblock ${px - 3} ${py} ${pz - 3} end_rod`, `setblock ${px + 3} ${py} ${pz - 3} end_rod`,
     `setblock ${px - 3} ${py} ${pz + 3} end_rod`, `setblock ${px + 3} ${py} ${pz + 3} end_rod`,
   ]) server.command(command);
-  await sleep(1000);
+  await sleep(1500);
+  // Standing on the pad's purpur rim, outside the zone, looking at its centre.
+  const rim = async () => {
+    await server.lab(`tp ${PLAYER} world ${px + 3.5} ${py} ${pz + 0.5}`);
+    server.command(`tp ${PLAYER} ${px + 3.5} ${py} ${pz + 0.5} 90 30`);
+  };
 
   // The zone, made the way an admin would: two corners and zone create.
   server.command(`op ${PLAYER}`);
@@ -231,15 +236,18 @@ async function scenes(server) {
   await server.lab(`sudo ${PLAYER} rtpadmin zone create spawn overworld`);
   for (const setting of ['countdown 10', 'min-players 2', 'spread 3']) await server.lab(`sudo ${PLAYER} rtpadmin zone set spawn ${setting}`);
   server.command(`deop ${PLAYER}`);
-  // A view over the pad from the south-east, a little above it.
-  await server.lab(`tp ${PLAYER} world ${px + 6.5} ${py + 3} ${pz + 6.5}`);
-  server.command(`tp ${PLAYER} ${px + 6.5} ${py + 3} ${pz + 6.5} 135 22`);
+  // The overview: from above the south-east corner, in spectator mode so the camera can hover.
+  server.command(`gamemode spectator ${PLAYER}`);
+  await server.lab(`tp ${PLAYER} world ${px + 7.5} ${py + 5} ${pz + 7.5}`);
+  server.command(`tp ${PLAYER} ${px + 7.5} ${py + 5} ${pz + 7.5} 135 32`);
   await sleep(55_000); // terrain loads slowly with software rendering
   x('key', 'F1');
   await sleep(1500);
   screenshot('scenery');
   x('key', 'F1');
-  await sleep(10_500); // the zone and setup messages fade from chat
+  server.command(`gamemode survival ${PLAYER}`);
+  await rim();
+  await sleep(12_000); // the zone and setup messages fade from chat
 
   // The menu.
   const opening = record('menu', 16);
@@ -291,8 +299,8 @@ async function scenes(server) {
   }
 
   // The group zone: Moonbeam waits on the pad, Kiri steps on, and both land together.
-  await server.lab(`tp ${PLAYER} world ${px - 1 + 0.5} ${py} ${pz + 0.5}`);
-  server.command(`tp ${PLAYER} ${px - 1 + 0.5} ${py} ${pz + 0.5} -90 8`);
+  await server.lab(`tp ${PLAYER} world ${px - 1.5} ${py} ${pz + 0.5}`);
+  server.command(`tp ${PLAYER} ${px - 1.5} ${py} ${pz + 0.5} -90 12`);
   await sleep(45_000);
   screenshot('zone-waiting');
   const kiri = await joinBot(FRIEND, VERSION, null, {}, PORT);
@@ -300,8 +308,8 @@ async function scenes(server) {
     await sleep(1500);
     const countdown = record('zone', 18);
     await sleep(500);
-    await server.lab(`tp ${FRIEND} world ${px + 1 + 0.5} ${py} ${pz + 0.5}`);
-    server.command(`tp ${FRIEND} ${px + 1 + 0.5} ${py} ${pz + 0.5} 90 0`);
+    await server.lab(`tp ${FRIEND} world ${px + 1.5} ${py} ${pz - 0.5}`);
+    server.command(`tp ${FRIEND} ${px + 1.5} ${py} ${pz - 0.5} 90 0`);
     await sleep(3200);
     screenshot('zone-countdown');
     await sleep(3000);
