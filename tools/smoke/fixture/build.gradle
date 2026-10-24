@@ -1,0 +1,31 @@
+// Test-only server fixture for the smoke matrix: an in-memory Vault economy, helper console commands and an
+// API listener. Never shipped; see tools/smoke/README.md. Build the plugin first (it compiles against its jar).
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://repo.papermc.io/repository/maven-public/' }
+    maven { url = 'https://maven.enginehub.org/repo/' }
+    maven {
+        url = 'https://jitpack.io'
+        content { includeGroup 'com.github.MilkBowl' }
+    }
+}
+
+dependencies {
+    compileOnly 'io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT'
+    compileOnly('com.github.MilkBowl:VaultAPI:1.7') { transitive = false }
+    compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.9'
+    compileOnly files("../../../build/libs/DonutRTP-${findProperty('donutrtp.version') ?: '2.0.0'}.jar")
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 17
+}
+
+jar {
+    archiveFileName.set('RtpLabFixture.jar')
+}
