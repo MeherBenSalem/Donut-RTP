@@ -1,0 +1,5 @@
+[DonutRTP] Upgraded your DonutRTP 1.x config to 2.0. The old files are kept as config-1.x.yml and messages-1.x.yml.
+[DonutRTP]   The WorldGuard zone on region 'spawn_rtp' is now zone 'spawn_rtp' in zones.yml.
+[DonutRTP]   Cuboid zone 'nether_pad' is now zone 'nether_pad' in zones.yml.
+[DonutRTP] Zone 'spawn_rtp' uses WorldGuard region 'spawn_rtp' but WorldGuard is not installed. It does nothing.
+[DonutRTP] DonutRTP 2.0.0 enabled on Paper (async chunks: true, async teleport: true) with 3 destinations and 2 zones.
