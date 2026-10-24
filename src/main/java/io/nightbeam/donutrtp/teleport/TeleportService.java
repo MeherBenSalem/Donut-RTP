@@ -148,6 +148,11 @@ public final class TeleportService implements Listener {
             return;
         }
         Settings.Warmup warmup = settings.get().warmup();
+        // Events catch moves at once; this catches the rest (some Folia builds fire no event for a plugin's teleport).
+        if (warmup.cancelOnMove() && movedOff(entry.origin, player.getLocation())) {
+            cancel(player, "cancelled-move");
+            return;
+        }
         Messages m = messages.get();
         if (warmup.actionbar()) {
             Text.actionBar(player, m.raw("countdown-actionbar", "seconds", left));
@@ -159,6 +164,13 @@ public final class TeleportService implements Listener {
         warmup.tickSound().play(player);
         entry.task = scheduler.entityLater(player, () -> {
             if (left <= 1) {
+                if (pending.get(player.getUniqueId()) != entry) {
+                    return;
+                }
+                if (settings.get().warmup().cancelOnMove() && movedOff(entry.origin, player.getLocation())) {
+                    cancel(player, "cancelled-move");
+                    return;
+                }
                 entry.warming = false;
                 go(player, destination, source, entry);
             } else {
@@ -344,14 +356,14 @@ public final class TeleportService implements Listener {
             return;
         }
         Location to = event.getTo();
-        if (to == null) {
-            return;
-        }
-        // Only walking off the block counts; jumping, falling and turning never cancel.
-        if (to.getWorld() != entry.origin.getWorld()
-                || to.getBlockX() != entry.origin.getBlockX() || to.getBlockZ() != entry.origin.getBlockZ()) {
+        if (to != null && movedOff(entry.origin, to)) {
             cancel(event.getPlayer(), "cancelled-move");
         }
+    }
+
+    /** Only leaving the block counts; jumping, falling and turning never do. */
+    private static boolean movedOff(Location origin, Location to) {
+        return to.getWorld() != origin.getWorld() || to.getBlockX() != origin.getBlockX() || to.getBlockZ() != origin.getBlockZ();
     }
 
     @EventHandler

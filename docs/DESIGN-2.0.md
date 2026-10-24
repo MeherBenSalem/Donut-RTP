@@ -119,7 +119,9 @@ Stored in `zones.yml`, managed with `/rtpadmin zone ...`.
 | `display` | `title`, `actionbar`, `bossbar` on/off |
 | `cancel-on-move` | INDIVIDUAL: walking off your block cancels (jumping never does) |
 
-Leaving a zone always cancels your part of it. Players without `donutrtp.zone.use` are ignored. Players on cooldown
+Membership follows move and teleport events, and once a second it is checked again from where players are: some
+Folia builds fire no event when a plugin teleports a player, and a warmup is checked the same way. Leaving a zone
+always cancels your part of it. Players without `donutrtp.zone.use` are ignored. Players on cooldown
 are told how long is left, and join the zone when it runs out if they are still standing in it. A GROUP zone shows
 "teleporting" until every member has moved, so nobody sees "waiting for players" in between. The cuboid's top gets
 two extra blocks so jumping never counts as leaving.

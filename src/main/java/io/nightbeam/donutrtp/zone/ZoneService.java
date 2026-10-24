@@ -5,6 +5,7 @@ import io.nightbeam.donutrtp.config.Messages;
 import io.nightbeam.donutrtp.config.Settings;
 import io.nightbeam.donutrtp.destination.Destination;
 import io.nightbeam.donutrtp.hook.WorldGuardHook;
+import io.nightbeam.donutrtp.platform.Platform;
 import io.nightbeam.donutrtp.platform.Scheduler;
 import io.nightbeam.donutrtp.platform.Text;
 import io.nightbeam.donutrtp.search.LocationSearch;
@@ -290,7 +291,41 @@ public final class ZoneService implements Listener {
         }
     }
 
+    /**
+     * Who is in which zone, from where players are rather than from events: some Folia builds fire no event when a
+     * plugin teleports a player, so events alone would miss players put onto a pad or sent away from one.
+     */
+    private void scan() {
+        Set<String> worlds = new java.util.HashSet<>();
+        for (Zone zone : zones.values()) {
+            if (zone.enabled()) {
+                worlds.add(zone.area().world());
+            }
+        }
+        if (worlds.isEmpty() && memberOf.isEmpty()) {
+            return;
+        }
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (Platform.folia()) {
+                scheduler.entity(player, () -> recheck(player, worlds));
+            } else {
+                recheck(player, worlds);
+            }
+        }
+    }
+
+    private void recheck(Player player, Set<String> worlds) {
+        if (!player.isOnline()) {
+            return;
+        }
+        Location at = player.getLocation();
+        if (memberOf.containsKey(player.getUniqueId()) || (at.getWorld() != null && worlds.contains(at.getWorld().getName()))) {
+            update(player, at);
+        }
+    }
+
     private void tick() {
+        scan();
         for (Zone zone : zones.values()) {
             State state = states.get(zone.id());
             if (state == null || !zone.enabled()) {
@@ -496,6 +531,8 @@ public final class ZoneService implements Listener {
         state.departing.add(id);
         return teleports.deliver(player, destination, RtpSource.ZONE, spot).whenComplete((moved, error) -> {
             if (Boolean.TRUE.equals(moved)) {
+                // Not left to the teleport event, which some Folia builds do not fire.
+                leave(player, zone.id(), false);
                 if (!player.hasPermission(TeleportService.BYPASS_COOLDOWN)) {
                     cooldowns.start(id, CooldownStore.zoneKey(zone.id()), zone.cooldown());
                 }
