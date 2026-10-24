@@ -1,0 +1,94 @@
+warmup-seconds: 3
+cooldown-seconds: 600
+max-attempts: 25
+instant-teleport: false
+
+update-check:
+  enabled: false
+  notify-ops-on-join: true
+  join-message: "&e[DonutRTP] &7Update available: &f{0} &7— &b{1}"
+
+worlds:
+  overworld:
+    world-name: survival
+    radius: 8000
+    min-y: 64
+  nether:
+    world-name: survival_nether
+    radius: 1000
+    min-y: 40
+  end:
+    world-name: survival_the_end
+    radius: 3000
+    min-y: 50
+
+gui:
+  fill-empty-slots: false
+  items:
+    overworld:
+      slot: 12
+      name: "&aWild"
+      lore:
+        - "&7Go wild"
+      material: GRASS_BLOCK
+    nether:
+      slot: 13
+      name: "&cNether RTP"
+      lore: []
+      material: NETHERRACK
+      head:
+        texture: "3b3125891576299764df12836f0b287cd85b9fbb529b2ff7bceb784d48cba"
+
+actionbar-cooldown:
+  enabled: true
+  sound: BLOCK_NOTE_BLOCK_HAT
+  volume: 1.0
+  pitch: 1.0
+
+teleport-sound:
+  enabled: false
+  sound: ENTITY_ENDERMAN_TELEPORT
+  volume: 1.0
+  pitch: 1.0
+
+rtp-zone:
+  enabled: true
+  destination-world-type: NETHER
+  worldguard:
+    enabled: true
+    region: "spawn_exit"
+    world: "survival"
+  trigger:
+    mode: "ENTER"
+    require-player-movement: true
+  cooldown:
+    seconds: 120
+  countdown:
+    enabled: true
+    seconds: 7
+    cancel-on-move: true
+
+rtp-zones:
+  enabled: true
+  zones:
+    spawn_pad:
+      enabled: true
+      world: survival
+      world-type: END
+      x: 0.5
+      y: 64.0
+      z: 0.5
+      half-size-x: 3
+      half-size-y: 2
+      half-size-z: 3
+      countdown-seconds: 10
+      permission: donutrtp.zone.pad
+    arena:
+      enabled: false
+      world: survival
+      x: 100
+      y: 70
+      z: 100
+      half-size-x: 2
+      half-size-y: 2
+      half-size-z: 2

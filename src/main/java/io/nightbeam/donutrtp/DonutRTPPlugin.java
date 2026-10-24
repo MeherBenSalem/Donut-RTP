@@ -1,116 +1,246 @@
 package io.nightbeam.donutrtp;
 
+import io.nightbeam.donutrtp.command.AdminCommand;
 import io.nightbeam.donutrtp.command.RtpCommand;
-import io.nightbeam.donutrtp.config.ConfigManager;
-import io.nightbeam.donutrtp.gui.GuiManager;
-import io.nightbeam.donutrtp.integration.worldguard.WorldGuardHook;
-import io.nightbeam.donutrtp.listener.PlayerJoinListener;
-import io.nightbeam.donutrtp.listener.PlayerMoveCancelListener;
-import io.nightbeam.donutrtp.listener.RtpZoneListener;
-import io.nightbeam.donutrtp.rtp.RtpManager;
-import io.nightbeam.donutrtp.rtp.RtpZoneManager;
-import io.nightbeam.donutrtp.util.FoliaCompat;
-import io.nightbeam.donutrtp.util.HeadDatabaseService;
-import io.nightbeam.donutrtp.util.ModrinthUpdateChecker;
+import io.nightbeam.donutrtp.config.ConfigLoader;
+import io.nightbeam.donutrtp.config.Messages;
+import io.nightbeam.donutrtp.config.Settings;
+import io.nightbeam.donutrtp.gui.RtpMenu;
+import io.nightbeam.donutrtp.hook.GriefPreventionHook;
+import io.nightbeam.donutrtp.hook.HeadDatabaseHook;
+import io.nightbeam.donutrtp.hook.Payments;
+import io.nightbeam.donutrtp.hook.PlaceholderHook;
+import io.nightbeam.donutrtp.hook.WorldGuardHook;
+import io.nightbeam.donutrtp.platform.Platform;
+import io.nightbeam.donutrtp.platform.Scheduler;
+import io.nightbeam.donutrtp.search.LocationSearch;
+import io.nightbeam.donutrtp.teleport.CooldownStore;
+import io.nightbeam.donutrtp.teleport.TeleportService;
+import io.nightbeam.donutrtp.util.UpdateChecker;
+import io.nightbeam.donutrtp.zone.ZoneService;
+import io.nightbeam.donutrtp.zone.ZoneStore;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.logging.Level;
 import org.bstats.bukkit.Metrics;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public final class DonutRTPPlugin extends JavaPlugin {
+public final class DonutRTPPlugin extends JavaPlugin implements Listener {
+    private static final int BSTATS_ID = 33560;
 
-    private FoliaCompat foliaCompat;
-    private ConfigManager configManager;
-    private HeadDatabaseService headDatabaseService;
-    private GuiManager guiManager;
-    private RtpManager rtpManager;
-    private RtpZoneManager rtpZoneManager;
-    private WorldGuardHook worldGuardHook;
-    private volatile String updateLatestVersion;
-    private volatile String updateDownloadUrl;
+    private volatile Settings settings;
+    private volatile Messages messages;
+    private volatile Payments payments = Payments.NONE;
+    private volatile String newerVersion;
+    private Scheduler scheduler;
+    private WorldGuardHook worldGuard;
+    private GriefPreventionHook griefPrevention;
+    private CooldownStore cooldowns;
+    private LocationSearch search;
+    private TeleportService teleports;
+    private ZoneStore zoneStore;
+    private ZoneService zones;
+    private RtpMenu menu;
+    private Scheduler.Task saveTask;
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
-        saveResource("messages.yml", false);
-
-        this.foliaCompat = new FoliaCompat(this);
-        this.configManager = new ConfigManager(this);
-        this.configManager.reload();
-        this.headDatabaseService = new HeadDatabaseService(this);
-        this.worldGuardHook = WorldGuardHook.create(this);
-
-        this.rtpManager = new RtpManager(this, foliaCompat, configManager);
-        this.rtpZoneManager = new RtpZoneManager(foliaCompat, configManager, rtpManager, worldGuardHook);
-        this.guiManager = new GuiManager(this, configManager, rtpManager, headDatabaseService);
-
-        getServer().getPluginManager().registerEvents(guiManager, this);
-        getServer().getPluginManager().registerEvents(new PlayerMoveCancelListener(rtpManager), this);
-        getServer().getPluginManager().registerEvents(new RtpZoneListener(rtpZoneManager), this);
-        getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
-
-        RtpCommand command = new RtpCommand(configManager, guiManager, rtpZoneManager);
-        PluginCommand rtp = getCommand("rtp");
-        if (rtp != null) {
-            rtp.setExecutor(command);
-            rtp.setTabCompleter(command);
-        } else {
-            getLogger().severe("Command 'rtp' is missing in plugin.yml");
+        scheduler = Scheduler.create(this);
+        try {
+            settings = ConfigLoader.load(this);
+        } catch (Exception e) {
+            getLogger().severe("config.yml has a mistake and was not loaded: " + e.getMessage());
+            getLogger().severe("Using the built-in defaults until it is fixed and /rtpadmin reload is run.");
+            settings = ConfigLoader.defaults(this);
         }
+        messages = Messages.load(this);
+
+        worldGuard = WorldGuardHook.create(getLogger());
+        griefPrevention = GriefPreventionHook.create(getLogger());
+        cooldowns = new CooldownStore(new File(getDataFolder(), "data/cooldowns.yml"), System::currentTimeMillis);
+        cooldowns.load(getLogger());
+
+        search = new LocationSearch(scheduler, this::settings, this::isProtected, getLogger());
+        teleports = new TeleportService(scheduler, this::settings, this::messages, this::payments, search, cooldowns, getLogger());
+        zoneStore = new ZoneStore(new File(getDataFolder(), "zones.yml"));
+        zones = new ZoneService(scheduler, this::settings, this::messages, worldGuard, search, teleports, cooldowns, getLogger());
+        menu = new RtpMenu(scheduler, this::settings, this::messages, this::payments, teleports,
+                new HeadDatabaseHook(getLogger()), getLogger());
+
+        Bukkit.getPluginManager().registerEvents(teleports, this);
+        Bukkit.getPluginManager().registerEvents(zones, this);
+        Bukkit.getPluginManager().registerEvents(menu, this);
+        Bukkit.getPluginManager().registerEvents(this, this);
+
+        AdminCommand admin = new AdminCommand(this);
+        bind("rtp", new RtpCommand(this, admin));
+        bind("rtpadmin", admin);
 
         try {
-            new Metrics(this, 33560);
-        } catch (Throwable t) {
-            getLogger().warning("[DonutRTP] Failed to start bStats metrics: " + t.getMessage());
+            zones.apply(zoneStore.load(getLogger()));
+        } catch (Exception e) {
+            getLogger().severe("zones.yml has a mistake and was not loaded: " + e.getMessage()
+                    + " No zones run until it is fixed and /rtpadmin reload is run.");
         }
+        search.start();
+        saveTask = scheduler.globalTimer(() -> scheduler.async(() -> cooldowns.saveIfDirty(getLogger())), 600L, 600L);
 
-        getLogger().info("DonutRTP enabled. Folia mode: " + foliaCompat.isFolia()
-                + ", WorldGuard: " + worldGuardHook.isAvailable());
+        // Economy plugins register with Vault while enabling, so look it up once every plugin is enabled.
+        scheduler.globalLater(() -> payments = Payments.create(getLogger()), 1L);
 
-        ModrinthUpdateChecker.checkAsync(this);
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            try {
+                new PlaceholderHook(this).register();
+                getLogger().info("Hooked into PlaceholderAPI: %donutrtp_...% placeholders are available.");
+            } catch (Throwable e) {
+                getLogger().warning("Could not register PlaceholderAPI placeholders: " + e);
+            }
+        }
+        try {
+            new Metrics(this, BSTATS_ID);
+        } catch (Throwable e) {
+            getLogger().log(Level.FINE, "bStats is unavailable", e);
+        }
+        checkForUpdate();
+        getLogger().info("DonutRTP " + getDescription().getVersion() + " enabled on " + Platform.describe() + " with "
+                + settings.destinations().size() + " destinations and " + zones.zones().size() + " zones.");
     }
 
     @Override
     public void onDisable() {
-        if (rtpZoneManager != null) {
-            rtpZoneManager.shutdown();
+        if (saveTask != null) {
+            saveTask.cancel();
         }
-        if (rtpManager != null) {
-            rtpManager.shutdown();
+        if (search != null) {
+            search.stop();
         }
-        if (foliaCompat != null) {
-            foliaCompat.shutdown();
+        if (zones != null) {
+            zones.clear(true);
+        }
+        if (teleports != null) {
+            teleports.clear();
+        }
+        if (cooldowns != null) {
+            cooldowns.saveIfDirty(getLogger());
         }
     }
 
-    public FoliaCompat getFoliaCompat() {
-        return foliaCompat;
+    /**
+     * /rtpadmin reload: config, messages and zones. A file with a mistake is skipped and keeps its previous settings;
+     * the problems are returned for the admin.
+     */
+    public List<String> reload() {
+        List<String> problems = new ArrayList<>();
+        try {
+            settings = ConfigLoader.load(this);
+        } catch (Exception e) {
+            problems.add("config.yml: " + e.getMessage());
+        }
+        messages = Messages.load(this);
+        try {
+            zones.apply(zoneStore.load(getLogger()));
+        } catch (Exception e) {
+            problems.add("zones.yml: " + e.getMessage());
+        }
+        search.start();
+        scheduler.global(() -> payments = Payments.create(getLogger()));
+        for (String problem : problems) {
+            getLogger().severe("Not reloaded, the previous settings stay: " + problem);
+        }
+        return problems;
     }
 
-    public ConfigManager getConfigManager() {
-        return configManager;
+    private void bind(String name, Object executor) {
+        PluginCommand command = Objects.requireNonNull(getCommand(name), "plugin.yml is missing /" + name);
+        command.setExecutor((org.bukkit.command.CommandExecutor) executor);
+        command.setTabCompleter((org.bukkit.command.TabCompleter) executor);
     }
 
-    public void setUpdateAvailable(String latestVersion, String downloadUrl) {
-        this.updateLatestVersion = latestVersion;
-        this.updateDownloadUrl = downloadUrl;
+    private boolean isProtected(Location location) {
+        Settings.Search rules = settings.search();
+        return (rules.avoidRegions() && worldGuard.isProtected(location))
+                || (rules.avoidClaims() && griefPrevention.isClaimed(location));
     }
 
-    public void clearUpdateAvailable() {
-        this.updateLatestVersion = null;
-        this.updateDownloadUrl = null;
+    private void checkForUpdate() {
+        if (!settings.updateCheck()) {
+            return;
+        }
+        String current = getDescription().getVersion();
+        scheduler.async(() -> {
+            try {
+                String latest = UpdateChecker.latest("DonutRTP/" + current + " (" + UpdateChecker.PAGE + ")");
+                if (latest != null && UpdateChecker.compare(latest, current) > 0) {
+                    newerVersion = latest;
+                    getLogger().warning("DonutRTP " + latest + " is available (you have " + current + "): " + UpdateChecker.PAGE);
+                }
+            } catch (Exception e) {
+                getLogger().log(Level.FINE, "Update check failed", e);
+            }
+        });
     }
 
-    public boolean hasUpdateAvailable() {
-        return updateLatestVersion != null && !updateLatestVersion.isBlank();
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        String latest = newerVersion;
+        if (latest != null && settings.notifyOpsOnJoin() && event.getPlayer().hasPermission("donutrtp.admin")) {
+            messages.send(event.getPlayer(), "update-available", "version", latest, "url", UpdateChecker.PAGE);
+        }
     }
 
-    public String getUpdateLatestVersion() {
-        return updateLatestVersion;
+    public Settings settings() {
+        return settings;
     }
 
-    public String getUpdateDownloadUrl() {
-        return updateDownloadUrl != null
-                ? updateDownloadUrl
-                : "https://modrinth.com/plugin/donut-rtp-and-rtp-zone";
+    public Messages messages() {
+        return messages;
+    }
+
+    public Payments payments() {
+        return payments;
+    }
+
+    public Scheduler scheduler() {
+        return scheduler;
+    }
+
+    public WorldGuardHook worldGuard() {
+        return worldGuard;
+    }
+
+    public GriefPreventionHook griefPrevention() {
+        return griefPrevention;
+    }
+
+    public CooldownStore cooldowns() {
+        return cooldowns;
+    }
+
+    public LocationSearch search() {
+        return search;
+    }
+
+    public TeleportService teleports() {
+        return teleports;
+    }
+
+    public ZoneStore zoneStore() {
+        return zoneStore;
+    }
+
+    public ZoneService zones() {
+        return zones;
+    }
+
+    public RtpMenu menu() {
+        return menu;
     }
 }

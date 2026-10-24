@@ -3,30 +3,42 @@ version: '${version}'
 main: io.nightbeam.donutrtp.DonutRTPPlugin
 api-version: '1.20'
 folia-supported: true
-softdepend: [HeadDatabase, WorldGuard]
+softdepend: [WorldGuard, GriefPrevention, Vault, PlaceholderAPI, HeadDatabase]
 author: NightBeam
-description: DonutSMP-style RTP GUI for Bukkit, Spigot, Paper, Purpur, and Folia.
+website: https://modrinth.com/plugin/donut-rtp-and-rtp-zone
+description: Random teleport menu and group RTP zones for Bukkit, Spigot, Paper, Purpur and Folia.
 
 commands:
   rtp:
-    description: Opens the RTP GUI
-    usage: /rtp [reload|zone ...]
-    permission: donutrtp.use
+    description: Opens the random teleport menu, or teleports to a destination
+    usage: /rtp [destination] | /rtp player <player> [destination]
+    aliases: [randomtp]
+  rtpadmin:
+    description: Manages DonutRTP zones and settings
+    usage: /rtpadmin <reload|info|pos1|pos2|zone>
     aliases: [donutrtp]
 
 permissions:
   donutrtp.use:
-    description: Allows using RTP GUI
+    description: Use /rtp and the menu
+    default: true
+  donutrtp.zone.use:
+    description: Be teleported by RTP zones
     default: true
   donutrtp.admin:
-    description: Allows reloading DonutRTP config
+    description: Reload, inspect and send other players with /rtp player
     default: op
-  donutrtp.zone.use:
-    description: Allows using RTP zones
-    default: true
+    children:
+      donutrtp.zone.admin: true
   donutrtp.zone.admin:
-    description: Allows managing the WorldGuard RTP zone
+    description: Create, change and delete RTP zones
     default: op
   donutrtp.cooldown.bypass:
-    description: Bypasses RTP cooldown when enabled in config
+    description: Skip RTP cooldowns
     default: op
+  donutrtp.cost.bypass:
+    description: Teleport for free when destinations have a cost
+    default: op
+  donutrtp.warmup.bypass:
+    description: Skip the warmup countdown
+    default: false

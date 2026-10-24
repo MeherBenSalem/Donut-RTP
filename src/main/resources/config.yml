@@ -1,137 +1,149 @@
-warmup-seconds: 5
-cooldown-seconds: 300
-max-attempts: 60
+# DonutRTP 2.0 configuration. Reload with /rtpadmin reload.
+# Colours: &a, &l ... and hex as &#RRGGBB. Messages are in messages.yml, RTP zones in zones.yml.
+config-version: 2
 
-# When true, teleports immediately after a safe location is found (skips warmup countdown).
-instant-teleport: false
+# Seconds to stand still before /rtp or the menu teleports you (0 = instant).
+warmup:
+  seconds: 5
+  # Walking off your block cancels the warmup. Jumping in place never does.
+  cancel-on-move: true
+  # Taking damage cancels the warmup.
+  cancel-on-damage: true
+  # Show the countdown on: the action bar, a title, or both.
+  actionbar: true
+  title: false
+  # Sound each second of the countdown (Bukkit name or key, empty = none).
+  tick-sound: ""
+
+cooldown:
+  # Seconds between teleports. Destinations can override it.
+  seconds: 300
+  # true: one cooldown for every destination. false: each destination has its own.
+  shared: true
+  # Shorter cooldowns for ranks: a player with donutrtp.cooldown.<rank> waits that many seconds instead.
+  # The lowest one a player has wins.
+  ranks:
+    vip: 120
+    mvp: 60
+
+search:
+  # How many spots are tried before giving up.
+  max-attempts: 40
+  # Safe spots kept ready per destination, so /rtp is instant. 0 = search on demand only.
+  pool-size: 3
+  # Seconds between background searches that refill the pools.
+  refill-seconds: 4
+  # Never land inside a WorldGuard region (other than __global__).
+  avoid-regions: true
+  # Never land inside a GriefPrevention claim.
+  avoid-claims: true
+  # Stay this many blocks inside the world border.
+  border-margin: 8
+
+landing:
+  # Seconds without fall damage after landing.
+  no-fall-damage-seconds: 5
+  # Seconds of full invulnerability after landing (0 = none).
+  invulnerable-seconds: 3
+  sound: ENTITY_ENDERMAN_TELEPORT
+  volume: 1.0
+  pitch: 1.0
+  # Particles around you when you land (Bukkit particle name, empty = none).
+  particle: PORTAL
+  # Commands run by the console after a teleport. {player}, {world}, {x}, {y}, {z}, {destination}.
+  commands: []
+
+menu:
+  title: "&8ʀᴀɴᴅᴏᴍ ᴛᴇʟᴇᴘᴏʀᴛ"
+  rows: 3
+  fill-empty-slots: true
+  filler: GRAY_STAINED_GLASS_PANE
+  # Added to an item's lore while you are on cooldown for it ({time}).
+  cooldown-lore: "&cAvailable in {time}"
+  # Added to an item's lore when you lack its permission.
+  locked-lore: "&cYou cannot use this destination."
+  # Added to an item's lore when it costs money ({cost}).
+  cost-lore: "&7Cost: &e{cost}"
+
+# Where players can be sent. Add as many as you like; each one shows in the menu.
+destinations:
+  overworld:
+    world: world
+    # SQUARE or CIRCLE around the centre. The world border is always respected.
+    shape: SQUARE
+    # {x, z}, or "spawn" for the world's spawn point.
+    center: {x: 0, z: 0}
+    min-radius: 300
+    max-radius: 5000
+    min-y: 60
+    max-y: 320
+    # Biome keys. allow: only these (empty = any). deny: never these.
+    biomes:
+      allow: []
+      deny: [minecraft:ocean, minecraft:deep_ocean, minecraft:cold_ocean, minecraft:deep_cold_ocean,
+             minecraft:frozen_ocean, minecraft:deep_frozen_ocean, minecraft:lukewarm_ocean,
+             minecraft:deep_lukewarm_ocean, minecraft:warm_ocean, minecraft:river, minecraft:frozen_river]
+    # Needed to use it; empty = everyone with donutrtp.use.
+    permission: ""
+    # Seconds; -1 = the global cooldown.
+    cooldown: -1
+    # Money per teleport with Vault (0 = free).
+    cost: 0
+    gui:
+      slot: 11
+      material: GRASS_BLOCK
+      # material: "hdb-46772"     (a HeadDatabase head)
+      # head:
+      #   texture: "<texture hash or base64>"
+      name: "&aOverworld"
+      lore:
+        - "&7Click to teleport somewhere"
+        - "&7random in the Overworld"
+  nether:
+    world: world_nether
+    shape: SQUARE
+    center: {x: 0, z: 0}
+    min-radius: 100
+    max-radius: 4000
+    min-y: 32
+    max-y: 120
+    biomes:
+      allow: []
+      deny: []
+    permission: ""
+    cooldown: -1
+    cost: 0
+    gui:
+      slot: 13
+      material: NETHERRACK
+      name: "&cNether"
+      lore:
+        - "&7Click to teleport somewhere"
+        - "&7random in the Nether"
+  end:
+    world: world_the_end
+    shape: CIRCLE
+    center: {x: 0, z: 0}
+    # The outer islands start about 1000 blocks out.
+    min-radius: 1100
+    max-radius: 3000
+    min-y: 40
+    max-y: 120
+    biomes:
+      allow: []
+      deny: []
+    permission: ""
+    cooldown: -1
+    cost: 0
+    gui:
+      slot: 15
+      material: END_STONE
+      name: "&dThe End"
+      lore:
+        - "&7Click to teleport somewhere"
+        - "&7random in The End"
 
 update-check:
-  # Check Modrinth for a newer release when the plugin starts.
+  # Check Modrinth for a newer release on startup and tell admins when they join.
   enabled: true
-  # Notify players with donutrtp.admin when they join if an update was found.
   notify-ops-on-join: true
-  # Placeholders: {0} = latest version, {1} = download URL
-  join-message: "&e[DonutRTP] &7Update available: &f{0} &7— &b{1}"
-
-worlds:
-  overworld:
-    world-name: world
-    radius: 5000
-    min-y: 60
-  nether:
-    world-name: world_nether
-    radius: 4000
-    min-y: 40
-  end:
-    world-name: world_the_end
-    radius: 3000
-    min-y: 50
-
-# GUI customization. Invalid materials, heads, or slots log a warning and fall back to defaults.
-gui:
-  fill-empty-slots: true
-  items:
-    overworld:
-      slot: 11
-      name: "&aOverworld RTP"
-      lore:
-        - "&7Click to randomly teleport"
-        - "&7in the Overworld"
-      material: GRASS_BLOCK
-      # Use a HeadDatabase ID as the icon (requires HeadDatabase plugin):
-      # material: "hdb-46772"
-      # Use a custom player head instead of material (head takes priority if set):
-      # head:
-      #   texture: "3b3125891576299764df12836f0b287cd85b9fbb529b2ff7bceb784d48cba"  # texture hash or full base64
-      #   # uuid: "550e8400-e29b-41d4-a716-446655440000"
-      #   # player: "Notch"
-    nether:
-      slot: 13
-      name: "&cNether RTP"
-      lore:
-        - "&7Click to randomly teleport"
-        - "&7in the Nether"
-      material: NETHERRACK
-    end:
-      slot: 15
-      name: "&dEnd RTP"
-      lore:
-        - "&7Click to randomly teleport"
-        - "&7in The End"
-      material: END_STONE
-
-# Sound played each second during the warmup action bar countdown.
-actionbar-cooldown:
-  enabled: false
-  sound: BLOCK_NOTE_BLOCK_HAT  # Bukkit enum name or namespaced key (e.g. block.note_block.hat)
-  volume: 1.0  # 0.0 to 2.0
-  pitch: 1.0   # 0.0 to 2.0
-
-# Sound played when a teleport succeeds. Invalid sounds fall back to ENTITY_ENDERMAN_TELEPORT.
-teleport-sound:
-  enabled: true
-  sound: ENTITY_ENDERMAN_TELEPORT  # Bukkit enum name or namespaced key (e.g. entity.enderman.teleport)
-  volume: 1.0  # 0.0 to 2.0
-  pitch: 1.0   # 0.0 to 2.0
-  # Examples:
-  # enabled: false
-  # sound: BLOCK_PORTAL_TRAVEL
-  # volume: 0.8
-  # pitch: 1.2
-
-# WorldGuard RTP zone: enter a configured region to start random teleport.
-# Requires WorldGuard (optional soft dependency). Use: /donutrtp zone set <region>
-rtp-zone:
-  enabled: true
-
-  # Destination world type for the random teleport (OVERWORLD, NETHER, or END).
-  destination-world-type: OVERWORLD
-
-  worldguard:
-    enabled: true
-    region: ""
-    world: "world"
-
-  trigger:
-    # ENTER = region entry only | INTERACT = region entry disabled | BOTH = region entry enabled
-    mode: "ENTER"
-    require-player-movement: true
-
-  cooldown:
-    seconds: 300
-    message: "&cYou must wait &e{time} &cbefore using the RTP zone again."
-    bypass-enabled: true
-    bypass-permission: "donutrtp.cooldown.bypass"
-
-  countdown:
-    enabled: true
-    seconds: 5
-    # Cancel the countdown if the player walks out of their block during warmup.
-    # Jumping in place (vertical-only movement) never cancels. Leaving the zone
-    # always cancels regardless of this setting.
-    cancel-on-move: false
-
-  messages:
-    entering-zone: "&eRandom teleport starting..."
-    searching: "&eSearching for a safe location..."
-    teleported: "&aYou were randomly teleported!"
-    no-safe-location: "&cNo safe location could be found."
-    countdown-cancelled: "&cRTP zone countdown cancelled."
-
-# Legacy cuboid RTP zones (1.3.0). Still supported when no WorldGuard region is configured.
-# Prefer rtp-zone + /donutrtp zone set for new setups.
-rtp-zones:
-  enabled: false
-  zones:
-    spawn_pad:
-      enabled: true
-      world: world
-      world-type: OVERWORLD
-      x: 0.5
-      y: 64.0
-      z: 0.5
-      half-size-x: 3
-      half-size-y: 2
-      half-size-z: 3
-      countdown-seconds: 10
-      # permission: donutrtp.zone.spawn_pad

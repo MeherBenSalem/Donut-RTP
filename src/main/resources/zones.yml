@@ -1,0 +1,27 @@
+# DonutRTP 2.0 zones. Create them in game with /rtpadmin zone create, or edit this file and /rtpadmin reload.
+#
+# zones:
+#   spawn:
+#     destination: overworld        # a destination from config.yml
+#     # GROUP: one shared countdown, everyone inside when it ends lands together.
+#     # INDIVIDUAL: your own countdown starts when you walk in.
+#     mode: GROUP
+#     countdown: 10                 # seconds
+#     min-players: 1                # GROUP: the countdown only runs with this many players inside
+#     spread: 3                     # GROUP: players land within this many blocks of each other
+#     cooldown: 30                  # seconds before the same player can use a zone again (0 = none)
+#     cancel-on-move: false         # INDIVIDUAL: walking off your block cancels (jumping never does)
+#     display:
+#       title: true
+#       actionbar: true
+#       bossbar: true
+#     # A cuboid (set with /rtpadmin pos1 and pos2) ...
+#     area:
+#       world: world
+#       min: [-3, 64, -3]
+#       max: [3, 66, 3]
+#     # ... or a WorldGuard region:
+#     # area:
+#     #   world: world
+#     #   region: rtp_pad
+zones: {}
