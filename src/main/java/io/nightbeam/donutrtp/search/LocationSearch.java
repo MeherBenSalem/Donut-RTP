@@ -162,50 +162,70 @@ public final class LocationSearch {
 
     /**
      * Spots for {@code count} players near {@code center}, at most {@code spread} blocks away and each on its own
-     * block. Runs on the thread that owns the centre and only reads loaded chunks it owns; every column in reach is
-     * tried, in random order. Players share the centre only when no other safe spot exists.
+     * block. The chunks in reach are loaded first (asynchronously on Paper and Folia), then every column in reach is
+     * tried in random order on the thread that owns the centre. Players share the centre only when no other safe spot
+     * exists.
      */
     public CompletableFuture<List<Location>> spread(Location center, int count, int spread, Destination destination) {
-        CompletableFuture<List<Location>> out = new CompletableFuture<>();
         World world = center.getWorld();
-        scheduler.region(world, center.getBlockX() >> 4, center.getBlockZ() >> 4, () -> {
-            List<Location> spots = new ArrayList<>(count);
-            spots.add(center);
-            Set<Long> used = new HashSet<>();
-            used.add(blockKey(center));
-            List<int[]> offsets = new ArrayList<>();
-            for (int dx = -spread; dx <= spread; dx++) {
-                for (int dz = -spread; dz <= spread; dz++) {
-                    if (dx != 0 || dz != 0) {
-                        offsets.add(new int[]{dx, dz});
-                    }
-                }
+        if (count <= 1 || spread <= 0) {
+            List<Location> same = new ArrayList<>(count);
+            for (int i = 0; i < count; i++) {
+                same.add(i == 0 ? center : center.clone());
             }
-            Collections.shuffle(offsets, ThreadLocalRandom.current());
-            for (int[] offset : offsets) {
-                if (spots.size() >= count) {
-                    break;
-                }
-                int x = center.getBlockX() + offset[0];
-                int z = center.getBlockZ() + offset[1];
-                if (!world.isChunkLoaded(x >> 4, z >> 4) || !scheduler.ownsChunk(world, x >> 4, z >> 4)) {
-                    continue;
-                }
-                try {
-                    Location spot = SpotCheck.findNear(world, x, z, center.getBlockY(), destination);
-                    if (spot != null && used.add(blockKey(spot))) {
-                        spots.add(spot);
-                    }
-                } catch (Throwable e) {
-                    log.log(Level.FINE, "Could not check a spread spot", e);
-                }
+            return CompletableFuture.completedFuture(same);
+        }
+        List<CompletableFuture<?>> loads = new ArrayList<>();
+        for (int chunkX = (center.getBlockX() - spread) >> 4; chunkX <= (center.getBlockX() + spread) >> 4; chunkX++) {
+            for (int chunkZ = (center.getBlockZ() - spread) >> 4; chunkZ <= (center.getBlockZ() + spread) >> 4; chunkZ++) {
+                loads.add(load(world, chunkX, chunkZ, true));
             }
-            while (spots.size() < count) {
-                spots.add(center.clone());
-            }
-            out.complete(spots);
-        });
+        }
+        CompletableFuture<List<Location>> out = new CompletableFuture<>();
+        CompletableFuture.allOf(loads.toArray(CompletableFuture[]::new)).whenComplete((ignored, error) ->
+                scheduler.region(world, center.getBlockX() >> 4, center.getBlockZ() >> 4,
+                        () -> out.complete(spreadSpots(center, count, spread, destination))));
         return out;
+    }
+
+    private List<Location> spreadSpots(Location center, int count, int spread, Destination destination) {
+        World world = center.getWorld();
+        List<Location> spots = new ArrayList<>(count);
+        spots.add(center);
+        Set<Long> used = new HashSet<>();
+        used.add(blockKey(center));
+        List<int[]> offsets = new ArrayList<>();
+        for (int dx = -spread; dx <= spread; dx++) {
+            for (int dz = -spread; dz <= spread; dz++) {
+                if (dx != 0 || dz != 0) {
+                    offsets.add(new int[]{dx, dz});
+                }
+            }
+        }
+        Collections.shuffle(offsets, ThreadLocalRandom.current());
+        for (int[] offset : offsets) {
+            if (spots.size() >= count) {
+                break;
+            }
+            int x = center.getBlockX() + offset[0];
+            int z = center.getBlockZ() + offset[1];
+            // On Folia a column near a region's edge can belong to another thread.
+            if (!scheduler.ownsChunk(world, x >> 4, z >> 4)) {
+                continue;
+            }
+            try {
+                Location spot = SpotCheck.findNear(world, x, z, center.getBlockY(), destination);
+                if (spot != null && used.add(blockKey(spot))) {
+                    spots.add(spot);
+                }
+            } catch (Throwable e) {
+                log.log(Level.FINE, "Could not check a spread spot", e);
+            }
+        }
+        while (spots.size() < count) {
+            spots.add(center.clone());
+        }
+        return spots;
     }
 
     private static long blockKey(Location at) {
