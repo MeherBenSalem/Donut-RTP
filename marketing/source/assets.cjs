@@ -269,9 +269,9 @@ const assets = {
   compatibility: card('compatibility', () => ({
     kicker: 'Compatibility', title: 'Tested on every version',
     points: [
-      'Paper, Folia, Purpur, Spigot and Bukkit',
+      'Runs on Paper, Folia, Purpur, Spigot and Bukkit',
       `Minecraft ${r.RANGE}, one jar`,
-      'Bots upgrade, teleport and share zones on each',
+      'Bots upgrade, teleport and share zones on every Paper and Folia version shown',
       'WorldGuard, GriefPrevention and Vault included',
     ],
     art: (() => {

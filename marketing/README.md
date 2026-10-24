@@ -53,7 +53,8 @@ A new release name or number goes in `RELEASE` in `source/render.cjs` and in the
 
 Every screenshot and GIF is an unedited capture of the **vanilla Minecraft 1.21.11 client**, launched with
 portablemc, on a **Paper 1.21.11** server running DonutRTP 2.0.0.
-- The client ran in a 1920×1080 Xvfb display with software rendering (Mesa llvmpipe) at GUI scale 3.
+- The client ran in a 1920×1080 Xvfb display with software rendering (Mesa llvmpipe) at GUI scale 3, with the
+  Bright brightness setting.
 - It was driven by [`tools/marketing/capture.mjs`](../tools/marketing/capture.mjs) through console commands and XTEST
   mouse and keyboard input.
 
@@ -68,9 +69,14 @@ portablemc, on a **Paper 1.21.11** server running DonutRTP 2.0.0.
   - Moonbeam clicked the Overworld in the menu and landed after the warmup.
   - The console sent Moonbeam to the Nether and the End with `/rtp player`.
   - Kiri, a mineflayer bot, stepped onto the pad with Moonbeam. The group countdown ran and both landed together.
-  - After that landing, Moonbeam was turned to face Kiri with `/execute ... facing entity`.
+  - After each landing the camera was turned with `/tp`: levelled to look around the landing, or aimed at Kiri.
+  - Moonbeam had hidden fire resistance, so a stray lava flow could not end a capture run.
 - **The upgrade card** shows the real console of a separate server started with DonutRTP 1.5.2 files.
 - **The GIFs** are real-time recordings (x11grab, 12 fps, cropped to the centre 1280×720 and scaled to 640×360).
+  Each one cuts at the teleport to a 3-second clip recorded at the landing once the client had drawn the terrain
+  (software rendering takes about 40 seconds).
+- **Two capture runs** were used, because every landing is random. The menu GIF and the Overworld and End landing views
+  come from one run; everything else comes from the other.
 
 ## Regenerating the artwork
 
