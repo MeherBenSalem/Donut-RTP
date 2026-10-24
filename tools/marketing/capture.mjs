@@ -286,6 +286,9 @@ async function scenes(server) {
   screenshot('landed-chat');
   const menuCut = (await landed - openingAt) / 1000 - 0.15;
   const menuClip = await opening;
+  // The camera keeps the downward look it had at the pad; level it to show the landing.
+  const level = () => server.command(`execute as ${PLAYER} at @s run tp @s ~ ~ ~ ~ 6`);
+  level();
   await sleep(40_000);
   gif([{ raw: menuClip, length: menuCut }, { raw: await record('menu-landed', 3) }], 'menu');
   await sleep(1000);
@@ -308,7 +311,10 @@ async function scenes(server) {
 
   // The Nether and the End, sent by the console (no warmup or cooldown).
   for (const destination of ['nether', 'end']) {
+    const arrived = landing(destination, 'ADMIN');
     server.command(`rtp player ${PLAYER} ${destination}`);
+    await arrived;
+    level();
     await sleep(50_000);
     x('key', 'F1');
     await sleep(1200);
