@@ -183,14 +183,21 @@ export async function scenario({ server, target, hooks, joinBot, step }) {
       // bot over blocks it has not received); before that the server rejects its moves.
       const onPlatform = () => Math.abs(walker.entity.position.x - 40.5) < 1 && Math.abs(walker.entity.position.z - 40.5) < 1
         && Math.abs(walker.entity.position.y - 120) < 1.5 && walker.blockAt(walker.entity.position.offset(1, -1, 0))?.name === 'stone';
+      const reached = Date.now();
       for (let i = 0; i < 100 && !onPlatform(); i++) await sleep(100);
       if (!onPlatform()) throw new Error(`the bot never reached the platform: ${walker.entity.position}`);
+      const waited = Date.now() - reached;
       await sleep(1_500);
       walker.chat('/rtp overworld');
       await chat(walker, /Teleporting in/);
+      const start = walker.entity.position.clone();
       walker.setControlState('forward', true);
       try {
         await chat(walker, /cancelled because you moved/, 1_800);
+      } catch (error) {
+        const there = await pos('Walker').catch(() => null);
+        throw new Error(`${error.message}; the bot walked from ${start} to ${walker.entity.position}, the server has it at `
+          + `${there ? `${there.x} ${there.y} ${there.z}` : 'unknown'}`);
       } finally {
         walker.setControlState('forward', false);
       }
@@ -201,6 +208,7 @@ export async function scenario({ server, target, hooks, joinBot, step }) {
       walker.setControlState('jump', true);
       await teleported('Walker', 'overworld', 'COMMAND');
       walker.setControlState('jump', false);
+      return `on the platform after ${waited} ms`;
     });
     walker.quit();
   }
