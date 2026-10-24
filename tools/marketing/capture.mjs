@@ -78,14 +78,18 @@ function record(name, seconds) {
   return new Promise((resolve) => proc.on('exit', () => resolve(raw)));
 }
 
-/** A 640x360 GIF from a recording, cropped to the centre 1280x720 of the screen (or the whole screen). */
-function gif(raw, name, { crop = true, start = 0, length = null } = {}) {
+/**
+ * A 640x360 GIF from one or more recordings played back to back, cropped to the centre 1280x720 of the screen.
+ * Each part is { raw, start?, length? } in seconds.
+ */
+function gif(parts, name) {
   fs.mkdirSync(gifs, { recursive: true });
   const file = path.join(gifs, `${name}.gif`);
-  const view = crop ? 'crop=1280:720:320:180,' : '';
-  const cut = [...(start ? ['-ss', String(start)] : []), ...(length ? ['-t', String(length)] : [])];
-  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...cut, '-i', raw, '-vf',
-    `${view}fps=12,scale=640:360:flags=lanczos,split[a][b];[a]palettegen=max_colors=160:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=4:diff_mode=rectangle`,
+  const inputs = parts.flatMap(({ raw, start = 0, length = null }) =>
+    [...(start ? ['-ss', start.toFixed(2)] : []), ...(length ? ['-t', length.toFixed(2)] : []), '-i', raw]);
+  const joined = parts.map((_, i) => `[${i}:v]`).join('') + `concat=n=${parts.length}:v=1:a=0,`;
+  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...inputs, '-filter_complex',
+    `${joined}crop=1280:720:320:180,fps=12,scale=640:360:flags=lanczos,split[a][b];[a]palettegen=max_colors=160:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=4:diff_mode=rectangle`,
     file]);
   console.log(`  recorded ${path.relative(repo, file)}`);
 }
@@ -195,6 +199,9 @@ async function main() {
 }
 
 async function scenes(server) {
+  // Resolves with the time the player's next RTP to `destination` lands (the fixture logs RtpTeleportEvent).
+  const landing = (destination, source = '') =>
+    server.waitFor(new RegExp(`event teleport ${PLAYER} ${destination} ${source}`), 60_000, `${destination} landing`).then(() => Date.now());
   await server.lab(`money ${PLAYER} 5000`);
   server.command(`recipe give ${PLAYER} *`);
 
@@ -250,7 +257,9 @@ async function scenes(server) {
   await sleep(12_000); // the zone and setup messages fade from chat
 
   // The menu.
+  // Each GIF cuts from the countdown to a clip taken once the client has drawn the new terrain.
   const opening = record('menu', 16);
+  const openingAt = Date.now();
   await sleep(300);
   await server.lab(`sudo ${PLAYER} rtp`);
   await sleep(2500);
@@ -266,14 +275,18 @@ async function scenes(server) {
   screenshot('menu-end');
   await hover(11, 3, 1200);
   // The warmup: title, action bar and chat, then the teleport.
+  const landed = landing('overworld');
   await clickSlot(11, 3, 900);
   screenshot('warmup');
   await sleep(1200);
   screenshot('warmup-2');
   await sleep(2600);
   screenshot('landed-chat');
-  gif(await opening, 'menu');
-  await sleep(45_000);
+  const menuCut = (await landed - openingAt) / 1000 - 0.15;
+  const menuClip = await opening;
+  await sleep(40_000);
+  gif([{ raw: menuClip, length: menuCut }, { raw: await record('menu-landed', 3) }], 'menu');
+  await sleep(1000);
   x('key', 'F1');
   await sleep(1200);
   screenshot('overworld-view');
@@ -311,6 +324,8 @@ async function scenes(server) {
   try {
     await sleep(1500);
     const countdown = record('zone', 18);
+    const countdownAt = Date.now();
+    const together = landing('overworld', 'ZONE');
     await sleep(500);
     await server.lab(`tp ${FRIEND} world ${px + 1.5} ${py} ${pz - 0.5}`);
     server.command(`tp ${FRIEND} ${px + 1.5} ${py} ${pz - 0.5} 90 0`);
@@ -318,13 +333,17 @@ async function scenes(server) {
     screenshot('zone-countdown');
     await sleep(3000);
     screenshot('zone-countdown-2');
-    await server.waitFor(new RegExp(`event teleport ${PLAYER} overworld ZONE`), 30_000, 'group teleport').catch(() => null);
+    const zoneCut = (await together - countdownAt) / 1000 - 0.15;
     await sleep(2500);
     screenshot('zone-landed-chat');
-    gif(await countdown, 'zone');
-    server.command(`execute as ${PLAYER} at @s facing entity ${FRIEND} eyes run tp @s ~ ~ ~ ~ ~`);
-    await sleep(45_000);
+    const zoneClip = await countdown;
+    // Face Kiri, looking a little down so both landing spots are in view.
+    server.command(`execute as ${PLAYER} at @s facing entity ${FRIEND} feet run tp @s ~ ~ ~ ~ 14`);
+    await sleep(40_000);
+    const after = record('zone-landed', 3);
+    await sleep(1500);
     screenshot('zone-landed');
+    gif([{ raw: zoneClip, length: zoneCut }, { raw: await after }], 'zone');
   } finally {
     kiri.quit();
   }
