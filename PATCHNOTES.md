@@ -1,5 +1,9 @@
 # DonutRTP Patch Notes
 
+## 2.0.1
+
+* **RTP zones with `cancel-on-move: true` no longer cancel right after you step in.** The countdown anchored on the block before the zone, so the next step on the pad cancelled it. Full notes: [DonutRTP-2.0.1-PatchNotes.md](DonutRTP-2.0.1-PatchNotes.md).
+
 ## 2.0.0: The Zone Update
 
 A full rewrite. The full notes are in [DonutRTP-2.0.0-PatchNotes.md](DonutRTP-2.0.0-PatchNotes.md).

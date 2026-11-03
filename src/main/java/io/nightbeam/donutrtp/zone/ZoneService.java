@@ -211,13 +211,13 @@ public final class ZoneService implements Listener {
             return;
         }
         if (current == null) {
-            enter(player, inside);
+            enter(player, inside, to);
         } else {
             moveWithin(player, inside, to);
         }
     }
 
-    private void enter(Player player, Zone zone) {
+    private void enter(Player player, Zone zone, Location at) {
         if (!player.hasPermission(USE_PERMISSION) || (!zone.permission().isEmpty() && !player.hasPermission(zone.permission()))) {
             return;
         }
@@ -233,16 +233,25 @@ public final class ZoneService implements Listener {
             messages.get().send(player, "zone-cooldown", "time", Durations.format(Durations.ceilSeconds(left)));
             return;
         }
-        admit(player, zone, state);
+        admit(player, zone, state, at);
     }
 
     private void admit(Player player, Zone zone, State state) {
+        admit(player, zone, state, player.getLocation());
+    }
+
+    /**
+     * {@code at} is where the player stands now. From a move event that is the event's destination:
+     * {@code player.getLocation()} still holds the previous position there, usually the block just outside the zone,
+     * so anchoring on it made the next step inside cancel a cancel-on-move countdown at once.
+     */
+    private void admit(Player player, Zone zone, State state, Location at) {
         UUID id = player.getUniqueId();
         state.cooling.remove(id);
         state.members.add(id);
         messages.get().send(player, "zone-entered");
         if (zone.mode() == Zone.Mode.INDIVIDUAL) {
-            state.anchors.put(id, player.getLocation());
+            state.anchors.put(id, at.clone());
             if (zone.countdown() <= 0) {
                 fireIndividual(player, zone, state);
             } else {
