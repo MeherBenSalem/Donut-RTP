@@ -1,8 +1,6 @@
 ![DonutRTP 2.0: The Zone Update](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/banner.png)
 
-**[Discord](https://discord.gg/TJc3CxR4jK) · [Premium plugins](https://nightbeam.dev/store) · [Support NightBeam](https://nightbeam.dev/support) · [NightBeam Pro](https://nightbeam.dev/memberships) · [All projects](https://nightbeam.dev/projects)**
-
-> **Running a server?** NightBeam's premium plugins are on [BuiltByBit](https://nightbeam.dev/store): NightWatch Pro anti-cheat, RegionVerse world management and more.
+**[Discord](https://discord.gg/TJc3CxR4jK) · [Source and issues](https://github.com/MeherBenSalem/Donut-RTP)**
 
 ## Random teleport and RTP zones for survival servers, without the lag
 
@@ -210,6 +208,10 @@ radius helps.
 
 ---
 
+> **Running a server?** NightBeam's premium plugins are on [BuiltByBit](https://nightbeam.dev/store): NightWatch Pro anti-cheat, RegionVerse world management and more.
+
+---
+
 ### More from NightBeam Studio
 
 - **[Remnants: Ashen Legacy](https://www.curseforge.com/minecraft/modpacks/remnants-ashen-legacy)**: the story-driven soulslike RPG modpack built on NightBeam's mods
@@ -218,4 +220,4 @@ radius helps.
 - **[Discord](https://discord.gg/TJc3CxR4jK)**: support, bug reports, suggestions and early looks
 - **[Support NightBeam](https://nightbeam.dev/support)**: help keep every mod free
 
-**Follow:** [YouTube](https://www.youtube.com/@nightbeamstudio) · [Instagram](https://www.instagram.com/nightbeamstudio/) · [X](https://x.com/NightBeamLLC) · [Facebook](https://www.facebook.com/profile.php?id=61574823331471) · [Source and issues](https://github.com/MeherBenSalem/Donut-RTP)
+**Follow:** [YouTube](https://www.youtube.com/@nightbeamstudio) · [Instagram](https://www.instagram.com/nightbeamstudio/) · [X](https://x.com/NightBeamLLC) · [Facebook](https://www.facebook.com/profile.php?id=61574823331471)
