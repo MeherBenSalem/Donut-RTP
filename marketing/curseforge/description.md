@@ -1,5 +1,9 @@
 ![DonutRTP 2.0: The Zone Update](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/banner.png)
 
+**[Discord](https://discord.gg/TJc3CxR4jK) · [Premium plugins](https://nightbeam.dev/store) · [Support NightBeam](https://nightbeam.dev/support) · [NightBeam Pro](https://nightbeam.dev/memberships) · [All projects](https://nightbeam.dev/projects)**
+
+> **Running a server?** NightBeam's premium plugins are on [BuiltByBit](https://nightbeam.dev/store): NightWatch Pro anti-cheat, RegionVerse world management and more.
+
 ## Random teleport and RTP zones for survival servers, without the lag
 
 **DonutRTP** is a free, open-source random teleport plugin for Paper, Folia, Purpur, Spigot and Bukkit, from
@@ -29,7 +33,7 @@ Each release is tested on every supported Paper and Folia version with real clie
 - **One item per destination**, as many as you like, in any slot of a one to six row menu.
 - Each item shows **your cooldown** ("Available in 4m 12s"), **the cost**, or **a lock** when you lack the
   permission. It updates every second while the menu is open.
-- `/rtp nether` skips the menu. Tab completion lists only the destinations you may use.
+- `/rtp nether` skips the menu. Tab completion lists just the destinations you may use.
 - Icons can be any item, a **HeadDatabase** head (`hdb-1234`), or a player head from a texture, a UUID or a name.
 
 ![Teleporting](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/header-teleporting.png)
@@ -80,10 +84,10 @@ spawn_pad` uses a region instead. Every setting changes in game with `/rtpadmin 
 ![Built not to lag](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/card-performance.png)
 
 Loading a chunk far from everything else is the expensive part of any random teleport.
-- On **Paper and Folia**, DonutRTP loads chunks asynchronously. Chunks for a waiting player load first, and each
+- On **Paper and Folia**, DonutRTP loads chunks asynchronously. Chunks for a waiting player load ahead of the rest, and each
   loaded chunk is fully used before another one is loaded.
 - A few **safe spots per destination are found ahead of time**, so most teleports start the moment the warmup ends.
-- On **Folia**, every block, player and chunk is touched only from the region that owns it.
+- On **Folia**, every block, player and chunk is touched solely from the region that owns it.
 - On **Spigot**, at most one chunk loads per tick.
 - When a search finds nothing, the console says why: no safe ground, denied biomes, claims, or a busy server.
 
@@ -91,7 +95,7 @@ Loading a chunk far from everything else is the expensive part of any random tel
 
 ![Any world, any shape](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/card-destinations.png)
 
-Add as many destinations as you like: a resource world, a "far lands" option for veterans, a VIP-only world. Each one
+Add as many destinations as you like: a resource world, a "far lands" option for veterans, a VIP world. Each one
 has its own:
 - world and **square or circle** shape;
 - centre (or the world spawn), **minimum and maximum distance**, and heights;
@@ -106,7 +110,7 @@ has its own:
 - One cooldown for every destination, or one each.
 - **Shorter cooldowns for ranks**: with `ranks: { vip: 120, mvp: 60 }`, players with `donutrtp.cooldown.vip` wait
   two minutes and `donutrtp.cooldown.mvp` one. The lowest a player has wins.
-- **Costs through Vault**, taken only once the player has landed, and refunded if the teleport fails.
+- **Costs through Vault**, taken once the player has landed, and refunded if the teleport fails.
 - Bypass permissions for cooldowns, costs and the warmup.
 
 ![Integrations](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/header-integrations.png)
@@ -132,7 +136,7 @@ All of these are optional:
 
 ![Upgrade in place](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/card-upgrade.png)
 
-Replace the jar and restart. DonutRTP upgrades your 1.x setup on the first start:
+Replace the jar and restart. DonutRTP upgrades your 1.x setup when it starts:
 - **Your settings carry over**: warmup, cooldown, worlds, radius, minimum height, sounds and menu items.
 - **Your zones carry over**: the WorldGuard zone becomes a zone named after its region, and each cuboid zone keeps
   its name and permission.
@@ -183,7 +187,7 @@ teleport cheap.
 
 **Do I need WorldGuard for zones?** No. Zones are boxes you select in game. WorldGuard regions work too.
 
-**Will my 1.x setup break?** No. It is upgraded on the first start and the old files are kept.
+**Will my 1.x setup break?** No. It is upgraded when the new version starts, and the old files are kept.
 
 **Folia?** Yes, every part of it, including group zones.
 
@@ -204,6 +208,14 @@ radius helps.
 
 ![divider](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/divider.png)
 
-**Discord**: [discord.gg/SAmd9fhNhr](https://discord.gg/SAmd9fhNhr) · **Source**:
-[GitHub](https://github.com/MeherBenSalem/Donut-RTP) (Apache 2.0) · **Support the project**:
-[nightbeam.dev/support](https://nightbeam.dev/support)
+---
+
+### More from NightBeam Studio
+
+- **[Remnants: Ashen Legacy](https://www.curseforge.com/minecraft/modpacks/remnants-ashen-legacy)**: the story-driven soulslike RPG modpack built on NightBeam's mods
+- **[Premium server plugins](https://nightbeam.dev/store)**: anti-cheat, ranked PvP, SMP setups and more on BuiltByBit
+- **[NightBeam Pro](https://nightbeam.dev/memberships)**: the model library and NightBeam Forge credits, from $5 a month
+- **[Discord](https://discord.gg/TJc3CxR4jK)**: support, bug reports, suggestions and early looks
+- **[Support NightBeam](https://nightbeam.dev/support)**: help keep every mod free
+
+**Follow:** [YouTube](https://www.youtube.com/@nightbeamstudio) · [Instagram](https://www.instagram.com/nightbeamstudio/) · [X](https://x.com/NightBeamLLC) · [Facebook](https://www.facebook.com/profile.php?id=61574823331471) · [Source and issues](https://github.com/MeherBenSalem/Donut-RTP)
