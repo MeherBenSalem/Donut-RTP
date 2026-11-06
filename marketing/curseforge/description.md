@@ -1,6 +1,6 @@
 ![DonutRTP 2.0: The Zone Update](https://raw.githubusercontent.com/MeherBenSalem/Donut-RTP/main/marketing/images/banner.png)
 
-**[Discord](https://discord.gg/TJc3CxR4jK) · [Source and issues](https://github.com/MeherBenSalem/Donut-RTP)**
+**[Docs](https://nightbeam.dev/docs/donut-rtp) · [Discord](https://discord.gg/TJc3CxR4jK) · [Source and issues](https://github.com/MeherBenSalem/Donut-RTP)**
 
 ## Random teleport and RTP zones for survival servers, without the lag
 
