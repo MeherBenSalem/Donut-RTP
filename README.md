@@ -44,8 +44,7 @@ Metrics: bStats plugin ID 33560, https://bstats.org/plugin/bukkit/DonutRTP/33560
 
 ## Installation
 
-1. Download `DonutRTP-2.0.0.jar` from [Modrinth](https://modrinth.com/plugin/donut-rtp-and-rtp-zone), CurseForge,
-   or [`releases/`](releases/).
+1. Download `DonutRTP-2.0.0.jar` from CurseForge or [`releases/`](releases/).
 2. Put it in `plugins/` and restart.
 3. Edit `plugins/DonutRTP/config.yml` (destinations and rules), `messages.yml` and `zones.yml`, then
    `/rtpadmin reload`.
