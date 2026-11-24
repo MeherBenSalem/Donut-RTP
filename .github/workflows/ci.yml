@@ -1,0 +1,75 @@
+name: CI
+
+# NightBeam plugin CI: unit tests, the plugin.yml check (api-version '1.20', folia-supported, bStats ID, Java 17
+# bytecode), the publisher script tests, and a smoke boot on Paper 1.20.1, Paper 26.3 and the newest Folia.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Build and unit tests
+        run: |
+          chmod +x gradlew
+          ./gradlew build --no-daemon
+      - name: Check plugin.yml and bytecode
+        run: python3 scripts/check_plugin_yml.py --jar build/libs/DonutRTP-*.jar
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Same-day guard tests
+        run: node --test scripts/same_day_guard.test.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: plugin-jar
+          path: build/libs/DonutRTP-*.jar
+          if-no-files-found: error
+
+  smoke:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { project: paper, version: "1.20.1" }
+          - { project: paper, version: "26.3" }
+          - { project: folia, version: latest }
+    name: smoke (${{ matrix.project }} ${{ matrix.version }})
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: |
+            17
+            21
+            25
+      - uses: actions/download-artifact@v4
+        with:
+          name: plugin-jar
+          path: artifact
+      - name: Boot server
+        run: >-
+          python3 scripts/smoke_boot.py --project ${{ matrix.project }} --version ${{ matrix.version }}
+          --jar 'artifact/DonutRTP-*.jar' --name DonutRTP --package io.nightbeam.donutrtp
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-log-${{ matrix.project }}-${{ matrix.version }}
+          path: smoke-server/console.log
+          if-no-files-found: ignore

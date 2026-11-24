@@ -3,6 +3,8 @@ version: '${version}'
 main: io.nightbeam.donutrtp.DonutRTPPlugin
 api-version: '1.20'
 folia-supported: true
+# bStats plugin ID (Bukkit ignores this key; CI checks it matches BSTATS_ID in DonutRTPPlugin)
+bstats-id: 33560
 softdepend: [WorldGuard, GriefPrevention, Vault, PlaceholderAPI, HeadDatabase]
 author: NightBeam
 website: https://modrinth.com/plugin/donut-rtp-and-rtp-zone

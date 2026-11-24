@@ -5,6 +5,10 @@ Random teleport and RTP zones for Paper, Folia, Purpur, Spigot and Bukkit, Minec
 `/rtp` opens a small menu to pick a world, and RTP zones at spawn send players into the wild: alone, or together
 with everyone standing on the pad when the timer runs out. Finding a spot never freezes the server.
 
+Supported versions: Paper and Folia 1.20 to 26.3, Java 17+ (one jar).
+
+Metrics: bStats plugin ID 33560, https://bstats.org/plugin/bukkit/DonutRTP/33560
+
 **2.0 "The Zone Update"** is a full rewrite. See [DonutRTP-2.0.0-PatchNotes.md](DonutRTP-2.0.0-PatchNotes.md).
 
 ## Features
@@ -93,6 +97,11 @@ public void onRtp(RtpPreTeleportEvent event) {
 npm --prefix tools/smoke install
 node tools/smoke/run.mjs            # every supported Paper and Folia version, with bots
 ```
+
+`./gradlew test` runs the unit tests. CI (`.github/workflows/ci.yml`) runs on every push to `main`: `./gradlew build`
+with the tests, `python3 scripts/check_plugin_yml.py` on the jar (`api-version: '1.20'`, `folia-supported: true`, the
+bStats ID, Java 17 bytecode), `node --test scripts/*.test.mjs`, and a smoke boot on Paper 1.20.1, Paper 26.3 and the
+newest Folia (`python3 scripts/smoke_boot.py`).
 
 [`tools/smoke/README.md`](tools/smoke/README.md) explains the bot matrix and [`docs/DESIGN-2.0.md`](docs/DESIGN-2.0.md)
 the design.
